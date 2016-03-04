@@ -1,0 +1,317 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		071CD80D1C89341F00E9B27F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 071CD80C1C89341F00E9B27F /* main.m */; };
+		071CD8101C89341F00E9B27F /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 071CD80F1C89341F00E9B27F /* AppDelegate.m */; };
+		071CD8131C89341F00E9B27F /* GameScene.m in Sources */ = {isa = PBXBuildFile; fileRef = 071CD8121C89341F00E9B27F /* GameScene.m */; };
+		071CD8151C89341F00E9B27F /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 071CD8141C89341F00E9B27F /* GameScene.sks */; };
+		071CD8181C89341F00E9B27F /* GameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 071CD8171C89341F00E9B27F /* GameViewController.m */; };
+		071CD81B1C89341F00E9B27F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 071CD8191C89341F00E9B27F /* Main.storyboard */; };
+		071CD81D1C89341F00E9B27F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 071CD81C1C89341F00E9B27F /* Assets.xcassets */; };
+		071CD8201C89341F00E9B27F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 071CD81E1C89341F00E9B27F /* LaunchScreen.storyboard */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		071CD8081C89341F00E9B27F /* ExodusDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExodusDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		071CD80C1C89341F00E9B27F /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		071CD80E1C89341F00E9B27F /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		071CD80F1C89341F00E9B27F /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		071CD8111C89341F00E9B27F /* GameScene.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GameScene.h; sourceTree = "<group>"; };
+		071CD8121C89341F00E9B27F /* GameScene.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GameScene.m; sourceTree = "<group>"; };
+		071CD8141C89341F00E9B27F /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
+		071CD8161C89341F00E9B27F /* GameViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GameViewController.h; sourceTree = "<group>"; };
+		071CD8171C89341F00E9B27F /* GameViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GameViewController.m; sourceTree = "<group>"; };
+		071CD81A1C89341F00E9B27F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		071CD81C1C89341F00E9B27F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		071CD81F1C89341F00E9B27F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		071CD8211C89341F00E9B27F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		071CD8051C89341F00E9B27F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		071CD7FF1C89341F00E9B27F = {
+			isa = PBXGroup;
+			children = (
+				071CD80A1C89341F00E9B27F /* ExodusDemo */,
+				071CD8091C89341F00E9B27F /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		071CD8091C89341F00E9B27F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				071CD8081C89341F00E9B27F /* ExodusDemo.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		071CD80A1C89341F00E9B27F /* ExodusDemo */ = {
+			isa = PBXGroup;
+			children = (
+				071CD80E1C89341F00E9B27F /* AppDelegate.h */,
+				071CD80F1C89341F00E9B27F /* AppDelegate.m */,
+				071CD8111C89341F00E9B27F /* GameScene.h */,
+				071CD8121C89341F00E9B27F /* GameScene.m */,
+				071CD8141C89341F00E9B27F /* GameScene.sks */,
+				071CD8161C89341F00E9B27F /* GameViewController.h */,
+				071CD8171C89341F00E9B27F /* GameViewController.m */,
+				071CD8191C89341F00E9B27F /* Main.storyboard */,
+				071CD81C1C89341F00E9B27F /* Assets.xcassets */,
+				071CD81E1C89341F00E9B27F /* LaunchScreen.storyboard */,
+				071CD8211C89341F00E9B27F /* Info.plist */,
+				071CD80B1C89341F00E9B27F /* Supporting Files */,
+			);
+			path = ExodusDemo;
+			sourceTree = "<group>";
+		};
+		071CD80B1C89341F00E9B27F /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				071CD80C1C89341F00E9B27F /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		071CD8071C89341F00E9B27F /* ExodusDemo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 071CD8241C89341F00E9B27F /* Build configuration list for PBXNativeTarget "ExodusDemo" */;
+			buildPhases = (
+				071CD8041C89341F00E9B27F /* Sources */,
+				071CD8051C89341F00E9B27F /* Frameworks */,
+				071CD8061C89341F00E9B27F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ExodusDemo;
+			productName = ExodusDemo;
+			productReference = 071CD8081C89341F00E9B27F /* ExodusDemo.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		071CD8001C89341F00E9B27F /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0720;
+				ORGANIZATIONNAME = abvgd;
+				TargetAttributes = {
+					071CD8071C89341F00E9B27F = {
+						CreatedOnToolsVersion = 7.2.1;
+					};
+				};
+			};
+			buildConfigurationList = 071CD8031C89341F00E9B27F /* Build configuration list for PBXProject "ExodusDemo" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 071CD7FF1C89341F00E9B27F;
+			productRefGroup = 071CD8091C89341F00E9B27F /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				071CD8071C89341F00E9B27F /* ExodusDemo */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		071CD8061C89341F00E9B27F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				071CD8151C89341F00E9B27F /* GameScene.sks in Resources */,
+				071CD8201C89341F00E9B27F /* LaunchScreen.storyboard in Resources */,
+				071CD81D1C89341F00E9B27F /* Assets.xcassets in Resources */,
+				071CD81B1C89341F00E9B27F /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		071CD8041C89341F00E9B27F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				071CD8181C89341F00E9B27F /* GameViewController.m in Sources */,
+				071CD8101C89341F00E9B27F /* AppDelegate.m in Sources */,
+				071CD8131C89341F00E9B27F /* GameScene.m in Sources */,
+				071CD80D1C89341F00E9B27F /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		071CD8191C89341F00E9B27F /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				071CD81A1C89341F00E9B27F /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		071CD81E1C89341F00E9B27F /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				071CD81F1C89341F00E9B27F /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		071CD8221C89341F00E9B27F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		071CD8231C89341F00E9B27F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		071CD8251C89341F00E9B27F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = ExodusDemo/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = ca.abvgd.ExodusDemo;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		071CD8261C89341F00E9B27F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = ExodusDemo/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = ca.abvgd.ExodusDemo;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		071CD8031C89341F00E9B27F /* Build configuration list for PBXProject "ExodusDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				071CD8221C89341F00E9B27F /* Debug */,
+				071CD8231C89341F00E9B27F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		071CD8241C89341F00E9B27F /* Build configuration list for PBXNativeTarget "ExodusDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				071CD8251C89341F00E9B27F /* Debug */,
+				071CD8261C89341F00E9B27F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 071CD8001C89341F00E9B27F /* Project object */;
+}
