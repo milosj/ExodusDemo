@@ -9,6 +9,12 @@
 #import "GameViewController.h"
 #import "GameScene.h"
 
+@interface GameViewController()
+
+@property (strong, nonatomic) GameScene* scene;
+
+@end
+
 @implementation GameViewController
 
 - (void)viewDidLoad
@@ -25,6 +31,7 @@
     // Create and configure the scene.
     GameScene *scene = [GameScene nodeWithFileNamed:@"GameScene"];
     scene.scaleMode = SKSceneScaleModeAspectFill;
+    self.scene = scene;
     
     // Present the scene.
     [skView presentScene:scene];
@@ -52,6 +59,12 @@
 
 - (BOOL)prefersStatusBarHidden {
     return YES;
+}
+- (IBAction)sliderDidSlide:(UISlider *)sender {
+    self.scene.zoom = sender.maximumValue - sender.value;
+}
+- (IBAction)switchDidSwitch:(UISwitch *)sender {
+    [self.scene setShowSymbols:sender.isOn];
 }
 
 @end

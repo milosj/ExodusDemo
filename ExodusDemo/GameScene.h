@@ -10,4 +10,9 @@
 
 @interface GameScene : SKScene
 
+@property (assign, nonatomic) CGFloat zoom;
+
+
+- (void)setShowSymbols:(BOOL)showSymbols;
+
 @end

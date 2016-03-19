@@ -15,6 +15,7 @@
 		071CD81B1C89341F00E9B27F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 071CD8191C89341F00E9B27F /* Main.storyboard */; };
 		071CD81D1C89341F00E9B27F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 071CD81C1C89341F00E9B27F /* Assets.xcassets */; };
 		071CD8201C89341F00E9B27F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 071CD81E1C89341F00E9B27F /* LaunchScreen.storyboard */; };
+		0735D9611C9B800500043363 /* SatelliteNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 0735D9601C9B800500043363 /* SatelliteNode.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +32,8 @@
 		071CD81C1C89341F00E9B27F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		071CD81F1C89341F00E9B27F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		071CD8211C89341F00E9B27F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		0735D95F1C9B800500043363 /* SatelliteNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SatelliteNode.h; sourceTree = "<group>"; };
+		0735D9601C9B800500043363 /* SatelliteNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SatelliteNode.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +70,8 @@
 				071CD80F1C89341F00E9B27F /* AppDelegate.m */,
 				071CD8111C89341F00E9B27F /* GameScene.h */,
 				071CD8121C89341F00E9B27F /* GameScene.m */,
+				0735D95F1C9B800500043363 /* SatelliteNode.h */,
+				0735D9601C9B800500043363 /* SatelliteNode.m */,
 				071CD8141C89341F00E9B27F /* GameScene.sks */,
 				071CD8161C89341F00E9B27F /* GameViewController.h */,
 				071CD8171C89341F00E9B27F /* GameViewController.m */,
@@ -161,6 +166,7 @@
 				071CD8181C89341F00E9B27F /* GameViewController.m in Sources */,
 				071CD8101C89341F00E9B27F /* AppDelegate.m in Sources */,
 				071CD8131C89341F00E9B27F /* GameScene.m in Sources */,
+				0735D9611C9B800500043363 /* SatelliteNode.m in Sources */,
 				071CD80D1C89341F00E9B27F /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -310,6 +316,7 @@
 				071CD8261C89341F00E9B27F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
