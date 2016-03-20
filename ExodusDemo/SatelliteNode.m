@@ -9,8 +9,8 @@
 #import "SatelliteNode.h"
 
 #define kG 0.0172021
-#define kGinCentiAUs kG
-#define kSquared kGinCentiAUs*kGinCentiAUs
+#define kSquared kG*kG
+#define unitsPerAU 1000
 
 
 @interface SatelliteNode()
@@ -65,7 +65,7 @@
 }
 
 - (CGFloat)spriteRadius {
-    return MIN(40,MAX(2, 5+log(self.mass)));
+    return MIN(4*unitsPerAU/10,MAX(2, 5*unitsPerAU/100+unitsPerAU/100*log(self.mass)));
 }
 
 - (UIColor*)colour {
@@ -99,7 +99,7 @@
     
     CGFloat d = [self distanceBetween:body and:satellite];
     
-    if (d < 0.01 || d > 1000) {
+    if (d < 0.01 || d > 100*unitsPerAU) {
         NSLog(@"crazy orbit %@ in %@", satellite, self);
         return;
     }
@@ -109,10 +109,10 @@
     }
     
     CGVector dv = satellite.inertialVector;
-    CGFloat g = kSquared/pow(d/100,3); //gaussian gravitational constant squared times 1 solar mass over radius in AU cubed
+    CGFloat g = kSquared/pow(d/unitsPerAU,3); //gaussian gravitational constant squared times 1 solar mass over radius in AU cubed
     
-    CGFloat gx = g*(body.position.x-satellite.position.x)/100;
-    CGFloat gy = g*(body.position.y-satellite.position.y)/100;
+    CGFloat gx = g*(body.position.x-satellite.position.x)/unitsPerAU;
+    CGFloat gy = g*(body.position.y-satellite.position.y)/unitsPerAU;
     
     if (isnan(gy)) {
         gy = 0;
@@ -125,8 +125,8 @@
     CGFloat ey = satellite.position.y;
     
     
-    CGFloat dx = 100*gx + dv.dx;
-    CGFloat dy = 100*gy + dv.dy;
+    CGFloat dx = unitsPerAU*gx + dv.dx;
+    CGFloat dy = unitsPerAU*gy + dv.dy;
     
     CGFloat newex = ex + dx;
     CGFloat newey = ey + dy;

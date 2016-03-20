@@ -42,7 +42,7 @@
     self.camera = cameraNode;
     
     self.scale = 1.0f;
-    self.zoom = 0.5f;
+    self.zoom = 5.5f;
     
     self.physicsWorld.gravity = CGVectorMake(0, 0);
     
@@ -62,7 +62,7 @@
     SatelliteNode *mercury = [SatelliteNode new];
     mercury.name = @"Mercury";
     mercury.text = @"☿";
-    mercury.position = CGPointMake(CGRectGetMidX(self.frame)-39,
+    mercury.position = CGPointMake(CGRectGetMidX(self.frame)-390,
                                  CGRectGetMidY(self.frame));
     mercury.initialPosition = mercury.position;
     mercury.mass = 0.055f;
@@ -70,7 +70,7 @@
     mercury.colour = [UIColor colorWithRed:0.77 green:0.66 blue:0.56 alpha:1.0];
     [self addChild:mercury];
     [self.satellites addObject:mercury];
-    mercury.initialVector = CGVectorMake(0, -2.73f); //2.74
+    mercury.initialVector = CGVectorMake(0, -27.3f); //2.74
     mercury.inertialVector = mercury.initialVector;
     self.mercury = mercury;
     self.trails[mercury.name] = [NSMutableArray new];
@@ -78,7 +78,7 @@
     SatelliteNode *venus = [SatelliteNode new];
     venus.text = @"♀";
     venus.name = @"Venus";
-    venus.position = CGPointMake(CGRectGetMidX(self.frame)-72.3,
+    venus.position = CGPointMake(CGRectGetMidX(self.frame)-723,
                                  CGRectGetMidY(self.frame));
     venus.initialPosition = venus.position;
     venus.mass = 0.815f;
@@ -86,13 +86,13 @@
     venus.colour = [UIColor colorWithRed:0.96 green:0.95 blue:0.57 alpha:1.0];
     [self addChild:venus];
     [self.satellites addObject:venus];
-    venus.initialVector = CGVectorMake(0, -2.02f);
+    venus.initialVector = CGVectorMake(0, -20.2f);
     venus.inertialVector = venus.initialVector;
     self.venus = venus;
     self.trails[venus.name] = [NSMutableArray new];
     
     SatelliteNode* earth = [SatelliteNode new];
-    CGFloat earthD = 101.67;
+    CGFloat earthD = 1016.7;
     earth.text = @"♁";
     earth.name = @"Earth";
     earth.orbitLength = 365;
@@ -103,7 +103,7 @@
     earth.colour = [UIColor colorWithRed:0.03 green:0.84 blue:1.00 alpha:1.0];
     [self addChild:earth];
     self.earth = earth;
-    earth.initialVector = CGVectorMake(0, -1.692);
+    earth.initialVector = CGVectorMake(0, -16.92);
     earth.inertialVector = earth.initialVector;
     [self.satellites addObject:self.earth];
     self.trails[earth.name] = [NSMutableArray new];
@@ -112,13 +112,13 @@
     luna.text = @"☽";
     luna.name = @"Luna";
     luna.orbitLength = 20;
-    luna.position = CGPointMake(-0.2654, 0);
+    luna.position = CGPointMake(-2.654, 0);
     luna.initialPosition = luna.position;
     luna.mass = 0.0123;
     luna.colour = [UIColor colorWithRed:0.80 green:0.85 blue:0.89 alpha:1.0];
     [earth addChild:luna];
     [earth.satellites addObject:luna];
-    luna.initialVector = CGVectorMake(0, -100*5.88e-4);
+    luna.initialVector = CGVectorMake(0, -1000*5.88e-4);
     luna.inertialVector = luna.initialVector;
 
     
@@ -126,14 +126,14 @@
     mars.text = @"♂";
     mars.name = @"Mars";
     mars.orbitLength = 687;
-    mars.position = CGPointMake(CGRectGetMidX(self.frame)-152.4,
+    mars.position = CGPointMake(CGRectGetMidX(self.frame)-1524,
                                  CGRectGetMidY(self.frame));
     mars.initialPosition = mars.position;
     mars.mass = 0.107f;
     mars.colour = [UIColor colorWithRed:0.83 green:0.34 blue:0.30 alpha:1.0];
     [self addChild:mars];
     self.mars = mars;
-    mars.initialVector = CGVectorMake(0, -1.390);
+    mars.initialVector = CGVectorMake(0, -13.90);
     mars.inertialVector = mars.initialVector;
     [self.satellites addObject:self.mars];
     self.trails[mars.name] = [NSMutableArray new];
