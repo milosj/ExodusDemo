@@ -11,13 +11,19 @@
 @interface SatelliteNode : SKNode
 
 @property (strong, nonatomic) NSString* text;
-@property (assign, nonatomic) CGFloat mass;
 @property (strong, nonatomic) UIColor* colour;
+@property (assign, atomic) BOOL isShowingSymbol;
+@property (assign, readonly, nonatomic) CGFloat spriteRadius;
+
+@property (assign, nonatomic) CGFloat mass;
 @property (assign, readonly, nonatomic) CGFloat solarMass;
+@property (assign, nonatomic) CGVector inertialVector;
 @property (assign, nonatomic) CGPoint initialPosition;
 @property (assign, nonatomic) CGVector initialVector;
 @property (assign, nonatomic) int orbitLength;
-@property (assign, atomic) BOOL isShowingSymbol;
 
+@property (strong, nonatomic) NSMutableArray<SatelliteNode*>* satellites;;
+
+- (void)update:(long int)time;
 
 @end

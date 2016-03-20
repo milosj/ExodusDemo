@@ -9,9 +9,6 @@
 #import "GameScene.h"
 #import "SatelliteNode.h"
 
-#define kG 0.0172021
-#define kGinCentiAUs kG
-#define kSquared kGinCentiAUs*kGinCentiAUs
 
 
 @interface GameScene()
@@ -27,7 +24,6 @@
 @property (assign, atomic) CGFloat scale;
 
 @property (strong, nonatomic) NSMutableArray<SatelliteNode*>* satellites;
-@property (strong, nonatomic) NSMutableDictionary<NSString*, NSValue*>* vectors;
 @property (strong, nonatomic) NSMutableDictionary<NSString*, NSMutableArray<SatelliteNode*>*>* trails;
 
 @property (assign, atomic) long int time;
@@ -61,7 +57,6 @@
     [self addChild:myLabel];
 
     self.satellites = [NSMutableArray new];
-    self.vectors = [NSMutableDictionary new];
     self.trails = [NSMutableDictionary new];
     
     SatelliteNode *mercury = [SatelliteNode new];
@@ -76,7 +71,7 @@
     [self addChild:mercury];
     [self.satellites addObject:mercury];
     mercury.initialVector = CGVectorMake(0, -2.73f); //2.74
-    self.vectors[mercury.name] = [NSValue valueWithCGVector:mercury.initialVector];
+    mercury.inertialVector = mercury.initialVector;
     self.mercury = mercury;
     self.trails[mercury.name] = [NSMutableArray new];
     
@@ -92,11 +87,11 @@
     [self addChild:venus];
     [self.satellites addObject:venus];
     venus.initialVector = CGVectorMake(0, -2.02f);
-    self.vectors[venus.name] = [NSValue valueWithCGVector:venus.initialVector]; //2.02
+    venus.inertialVector = venus.initialVector;
     self.venus = venus;
     self.trails[venus.name] = [NSMutableArray new];
     
-    SatelliteNode *earth = [SatelliteNode new];
+    SatelliteNode* earth = [SatelliteNode new];
     CGFloat earthD = 101.67;
     earth.text = @"♁";
     earth.name = @"Earth";
@@ -109,12 +104,25 @@
     [self addChild:earth];
     self.earth = earth;
     earth.initialVector = CGVectorMake(0, -1.692);
-    self.vectors[earth.name] = [NSValue valueWithCGVector:earth.initialVector];//sqrt(kSquared/earthD))]; //1.721
+    earth.inertialVector = earth.initialVector;
     [self.satellites addObject:self.earth];
     self.trails[earth.name] = [NSMutableArray new];
     
+    SatelliteNode* luna = [SatelliteNode new];
+    luna.text = @"☽";
+    luna.name = @"Luna";
+    luna.orbitLength = 20;
+    luna.position = CGPointMake(-0.2654, 0);
+    luna.initialPosition = luna.position;
+    luna.mass = 0.0123;
+    luna.colour = [UIColor colorWithRed:0.80 green:0.85 blue:0.89 alpha:1.0];
+    [earth addChild:luna];
+    [earth.satellites addObject:luna];
+    luna.initialVector = CGVectorMake(0, -100*5.88e-4);
+    luna.inertialVector = luna.initialVector;
+
     
-    SatelliteNode *mars = [SatelliteNode new];
+    SatelliteNode* mars = [SatelliteNode new];
     mars.text = @"♂";
     mars.name = @"Mars";
     mars.orbitLength = 687;
@@ -126,7 +134,7 @@
     [self addChild:mars];
     self.mars = mars;
     mars.initialVector = CGVectorMake(0, -1.390);
-    self.vectors[mars.name] = [NSValue valueWithCGVector:mars.initialVector];//sqrt(kSquared/earthD))]; //1.721
+    mars.inertialVector = mars.initialVector;
     [self.satellites addObject:self.mars];
     self.trails[mars.name] = [NSMutableArray new];
     
@@ -140,7 +148,7 @@
     [self addChild:sun];
     self.sun = sun;
     self.sun.zPosition = -1;
-    
+    self.sun.satellites = self.satellites;
     self.time = 1;
 }
 
@@ -168,97 +176,27 @@
     if (currentTime > self.nextUpdateTime) {
         self.nextUpdateTime = currentTime + 0.05f;
         for (SatelliteNode* satellite in self.satellites) {
-            [self update:currentTime forBody:self.sun andSatellite:satellite];
+            SatelliteNode* previousTrail = [self.trails[satellite.name] firstObject];
+            //            if (!previousTrail || (sqrt(pow(previousTrail.position.x-satellite.position.x,2)+pow(previousTrail.position.y-satellite.position.y,2))>10 + satellite.mass*15 && self.time < satellite.orbitLength)) {
+
+            if (!previousTrail || ( self.time < satellite.orbitLength && sqrt(pow(previousTrail.position.x-satellite.position.x,2)+pow(previousTrail.position.y-satellite.position.y,2))>2*satellite.spriteRadius)) {
+                SatelliteNode* trail = [satellite copy];
+                trail.alpha = 0.15f;
+                [self addChild:trail];
+                trail.isShowingSymbol = NO;
+                [self.trails[satellite.name] insertObject:trail atIndex:0];
+                if (self.trails[satellite.name].count > satellite.orbitLength) {
+                    [[self.trails[satellite.name] lastObject] removeFromParent];
+                    [self.trails[satellite.name] removeLastObject];
+                }
+            }
         }
+        [self.sun update:self.time];
         self.time++;
     }
 }
 
-- (void)update:(NSTimeInterval)currentTime forBody:(SatelliteNode*)body andSatellite:(SatelliteNode*)satellite {
-    
-    CGFloat d = [self distanceBetween:body and:satellite];
-    
-    if (d < 0.01 || d > 1000) {
-        return;
-    }
-    if (self.time+1 % satellite.orbitLength == 0  ) {
-        satellite.position = CGPointMake(0.5*(satellite.initialPosition.x+satellite.position.x),0.5*(satellite.initialPosition.y+satellite.position.y));
-        self.vectors[satellite.name] = [NSValue valueWithCGVector:satellite.initialVector];
-    }
-    
-    CGVector dv = [self.vectors[satellite.name] CGVectorValue];
-    CGFloat g = kSquared/pow(d/100,3); //gaussian gravitational constant squared times 1 solar mass
 
-    CGFloat gx = g*(body.position.x-satellite.position.x)/100;
-    CGFloat gy = g*(body.position.y-satellite.position.y)/100;
-    
-    if (isnan(gy)) {
-        gy = 0;
-    }
-    if (isnan(gx)) {
-        gx = 0;
-    }
-    
-    CGFloat ex = satellite.position.x;
-    CGFloat ey = satellite.position.y;
-
-
-    CGFloat dx = 100*gx + dv.dx;
-    CGFloat dy = 100*gy + dv.dy;
-
-    CGFloat newex = ex + dx;
-    CGFloat newey = ey + dy;
-    
-    SatelliteNode* previousTrail = [self.trails[satellite.name] firstObject];
-    if (!previousTrail || (sqrt(pow(previousTrail.position.x-newex,2)+pow(previousTrail.position.y-newey,2))>15 && self.time < satellite.orbitLength)) {
-        SatelliteNode* trail = [satellite copy];
-        trail.alpha = 0.15f;
-        [self addChild:trail];
-        trail.isShowingSymbol = NO;
-        [self.trails[satellite.name] insertObject:trail atIndex:0];
-        if (self.trails[satellite.name].count > 80) {
-            [[self.trails[satellite.name] lastObject] removeFromParent];
-            [self.trails[satellite.name] removeLastObject];
-        }
-    }
-    
-    satellite.position = CGPointMake(newex, newey);
-    self.vectors[satellite.name] = [NSValue valueWithCGVector:CGVectorMake(dx, dy)];
-    
-    
-//    self.label.text = [NSString stringWithFormat:@"d %.6f g %.6f g(%.6f, %.6f), e'(%.6f, %.6f), v'(%.6f, %.6f)",d, g, gx, gy, newex, newey, dx, dy];
-    if (satellite == self.earth) {
-//        NSLog([NSString stringWithFormat:@"d %.6f g %.6f g(%.6f, %.6f), e'(%.6f, %.6f), v'(%.6f, %.6f)",d, g, gx, gy, newex, newey, dx, dy]);
-    }
- 
-    
-}
-
--(CGFloat)distanceBetween:(SKNode*)objectA and:(SKNode*)objectB {
-    return sqrt(pow(objectA.position.x-objectB.position.x, 2) + pow(objectA.position.y-objectB.position.y, 2));
-}
-
-static inline CGPoint rwAdd(CGPoint a, CGPoint b) {
-    return CGPointMake(a.x + b.x, a.y + b.y);
-}
-
-static inline CGPoint rwSub(CGPoint a, CGPoint b) {
-    return CGPointMake(a.x - b.x, a.y - b.y);
-}
-
-static inline CGPoint rwMult(CGPoint a, float b) {
-    return CGPointMake(a.x * b, a.y * b);
-}
-
-static inline float rwLength(CGPoint a) {
-    return sqrtf(a.x * a.x + a.y * a.y);
-}
-
-// Makes a vector have a length of 1
-static inline CGPoint rwNormalize(CGPoint a) {
-    float length = rwLength(a);
-    return CGPointMake(a.x / length, a.y / length);
-}
 
 - (CGFloat)zoom {
     return self.scale;
