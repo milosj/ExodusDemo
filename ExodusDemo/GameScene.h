@@ -11,7 +11,7 @@
 @interface GameScene : SKScene
 
 @property (assign, nonatomic) CGFloat zoom;
-
+@property (assign, atomic) BOOL showTrails;
 
 - (void)setShowSymbols:(BOOL)showSymbols;
 

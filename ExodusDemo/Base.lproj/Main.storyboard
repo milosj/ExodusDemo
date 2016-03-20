@@ -17,7 +17,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="4" minValue="0.5" maxValue="4.4000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="qBv-ts-rS4">
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="4.4000000000000004" minValue="0.5" maxValue="4.4000000000000004" translatesAutoresizingMaskIntoConstraints="NO" id="qBv-ts-rS4">
                                 <rect key="frame" x="18" y="562" width="118" height="31"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="114" id="JYS-uE-7YE"/>
@@ -33,13 +33,21 @@
                                     <action selector="switchDidSwitch:" destination="BV1-FR-VrT" eventType="valueChanged" id="TBx-qG-7Sf"/>
                                 </connections>
                             </switch>
+                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bYg-eG-PHh">
+                                <rect key="frame" x="199" y="561" width="51" height="31"/>
+                                <connections>
+                                    <action selector="trailsSwitchDidSwitch:" destination="BV1-FR-VrT" eventType="valueChanged" id="412-f7-oXV"/>
+                                </connections>
+                            </switch>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="qBv-ts-rS4" firstAttribute="leading" secondItem="3se-qz-xqx" secondAttribute="leading" constant="20" symbolic="YES" id="GDc-E5-zEa"/>
+                            <constraint firstItem="bYg-eG-PHh" firstAttribute="leading" secondItem="vkq-u1-3fd" secondAttribute="trailing" constant="8" id="lLa-gD-Ciy"/>
                             <constraint firstItem="vkq-u1-3fd" firstAttribute="leading" secondItem="qBv-ts-rS4" secondAttribute="trailing" constant="8" id="pbK-Kx-wC8"/>
                             <constraint firstItem="qHh-Mt-9TT" firstAttribute="top" secondItem="qBv-ts-rS4" secondAttribute="bottom" constant="8" symbolic="YES" id="rVG-TM-DQZ"/>
                             <constraint firstItem="qHh-Mt-9TT" firstAttribute="top" secondItem="vkq-u1-3fd" secondAttribute="bottom" constant="8" id="sc2-YP-FdT"/>
+                            <constraint firstItem="qHh-Mt-9TT" firstAttribute="top" secondItem="bYg-eG-PHh" secondAttribute="bottom" constant="8" id="vI9-jn-iVI"/>
                         </constraints>
                     </view>
                 </viewController>

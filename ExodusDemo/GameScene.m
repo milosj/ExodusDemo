@@ -24,9 +24,14 @@
 @property (assign, atomic) CGFloat scale;
 
 @property (strong, nonatomic) NSMutableArray<SatelliteNode*>* satellites;
-@property (strong, nonatomic) NSMutableDictionary<NSString*, NSMutableArray<SatelliteNode*>*>* trails;
+@property (strong, nonatomic) NSMutableDictionary<NSString*, NSMutableArray<SKNode*>*>* trails;
 
 @property (assign, atomic) long int time;
+
+@property (assign, atomic) BOOL privateShowTrails;
+@property (assign, nonatomic) long int trailTime;
+
+@property (strong, nonatomic) dispatch_queue_t zoomQueue;
 
 @end
 
@@ -35,33 +40,33 @@
 -(void)didMoveToView:(SKView *)view {
     /* Setup your scene here */
     self.backgroundColor = [UIColor whiteColor];
+    self.showTrails = YES;
+    
+    self.zoomQueue = dispatch_queue_create("com.abvgd.exodus.zoom", DISPATCH_QUEUE_SERIAL);
     
     SKCameraNode* cameraNode = [SKCameraNode new];
     [self addChild:cameraNode];
     self.camera = cameraNode;
     cameraNode.position = CGPointZero;//CGPointMake(self.size.width / 2, self.size.height / 2);
 
-    self.scale = 1.0f;
-    SKAction* zoomInAction =  [SKAction scaleTo:8 duration:0];//fabs(oldScale - zoom)];
-    [self.camera runAction:zoomInAction];
-//    self.zoom = 5.5f;
     
     self.physicsWorld.gravity = CGVectorMake(0, 0);
     
     SKLabelNode *myLabel = [SKLabelNode labelNodeWithFontNamed:@"Ariel"];
     
-    myLabel.text = @"Hello, World!";
+    myLabel.text = @"";
     myLabel.fontSize = 25;
     myLabel.position = CGPointZero;
     self.label = myLabel;
     
-    [self addChild:myLabel];
+//    [self addChild:myLabel];
 
     self.satellites = [NSMutableArray new];
     self.trails = [NSMutableDictionary new];
     
     
     SatelliteNode *sun = [SatelliteNode new];
+    sun.isCastingShadow = NO;
     sun.text = @"☉";
     sun.position = CGPointZero;//CGPointMake(CGRectGetMidX(self.view.frame),
                                //CGRectGetMidY(self.view.frame));
@@ -135,8 +140,8 @@
     luna.initialPosition = luna.position;
     luna.mass = 0.0123;
     luna.colour = [UIColor colorWithRed:0.80 green:0.85 blue:0.89 alpha:1.0];
-    [self addChild:luna];
-    [earth.satellites addObject:luna];
+//    [self addChild:luna];
+//    [earth.satellites addObject:luna];
     luna.initialVector = CGVectorMake(0, -1000*5.88e-4);
     luna.inertialVector = luna.initialVector;
 
@@ -159,6 +164,8 @@
     self.trails[mars.name] = [NSMutableArray new];
     
     
+    self.scale = 0.128;
+    self.zoom = 4;
 
 }
 
@@ -186,14 +193,11 @@
     if (currentTime > self.nextUpdateTime) {
         self.nextUpdateTime = currentTime + 0.05f;
         for (SatelliteNode* satellite in self.satellites) {
-            SatelliteNode* previousTrail = [self.trails[satellite.name] firstObject];
-            //            if (!previousTrail || (sqrt(pow(previousTrail.position.x-satellite.position.x,2)+pow(previousTrail.position.y-satellite.position.y,2))>10 + satellite.mass*15 && self.time < satellite.orbitLength)) {
+            SKNode* previousTrail = [self.trails[satellite.name] firstObject];
 
-            if (!previousTrail || ( self.time < satellite.orbitLength && sqrt(pow(previousTrail.position.x-satellite.position.x,2)+pow(previousTrail.position.y-satellite.position.y,2))>2*satellite.spriteRadius)) {
-                SatelliteNode* trail = [satellite copy];
-                trail.alpha = 0.15f;
+            if (self.showTrails && (!previousTrail || ( self.trailTime < satellite.orbitLength && sqrt(pow(previousTrail.position.x-satellite.position.x,2)+pow(previousTrail.position.y-satellite.position.y,2))>2*satellite.spriteRadius))) {
+                SKNode* trail = satellite.trailNode;
                 [self addChild:trail];
-                trail.isShowingSymbol = NO;
                 [self.trails[satellite.name] insertObject:trail atIndex:0];
                 if (self.trails[satellite.name].count > satellite.orbitLength) {
                     [[self.trails[satellite.name] lastObject] removeFromParent];
@@ -203,6 +207,9 @@
         }
         [self.sun update:self.time];
         self.time++;
+        if (self.showTrails) {
+            self.trailTime++;
+        }
     }
 }
 
@@ -213,17 +220,23 @@
 }
 
 - (void)setZoom:(CGFloat)zoom {
-    
-    int i = (int)zoom;
-    SatelliteNode* satellite = self.satellites[i-1];
-    CGFloat lesserDimension = MIN(self.view.bounds.size.width, self.view.bounds.size.height);
-    CGFloat zoomRatio = 2*satellite.orbitRadius/lesserDimension+1;
-    if (self.scale != zoomRatio) {
-        CGFloat oldScale = self.scale;
-        self.scale = zoomRatio;
-        SKAction* zoomInAction =  [SKAction scaleTo:zoomRatio duration:fabs(oldScale - zoom)/10];
-        [self.camera runAction:zoomInAction];
-    }
+    dispatch_async(self.zoomQueue, ^{
+        int i = (int)zoom;
+        SatelliteNode* satellite = self.satellites[i-1];
+        CGFloat lesserDimension = MIN(self.view.bounds.size.width, self.view.bounds.size.height);
+        CGFloat zoomRatio = 2*satellite.orbitRadius/lesserDimension+1;
+        if (self.scale != zoomRatio) {
+            CGFloat oldScale = self.scale;
+            self.scale = zoomRatio;
+            SKAction* zoomInAction =  [SKAction scaleTo:zoomRatio duration:fabs(oldScale - zoom)/10];
+            dispatch_semaphore_t semaphore = dispatch_semaphore_create(101);
+
+            [self.camera runAction:zoomInAction completion:^{
+                dispatch_semaphore_signal(semaphore);
+            }];
+            dispatch_semaphore_wait(semaphore, 0);
+        }
+    });
 }
 
 - (void)setShowSymbols:(BOOL)showSymbols {
@@ -231,6 +244,30 @@
         self.sun.isShowingSymbol = showSymbols;
         for (SatelliteNode* satellite in self.satellites) {
             satellite.isShowingSymbol = showSymbols;
+            satellite.isCastingShadow = !showSymbols;
+        }
+    });
+}
+
+- (BOOL)showTrails {
+    return self.privateShowTrails;
+}
+
+- (void)setShowTrails:(BOOL)showTrails {
+    self.privateShowTrails = showTrails;
+    self.trailTime = 0;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (!showTrails) {
+            for (NSArray* satelliteTrails in self.trails.allValues) {
+                for (SKNode* trail in satelliteTrails) {
+                    [trail removeFromParent];
+                }
+            }
+            NSMutableDictionary* newTrails = [NSMutableDictionary new];
+            for (NSString* key in self.trails.allKeys) {
+                newTrails[key] = [NSMutableArray new];
+            }
+            self.trails = newTrails;
         }
     });
 }

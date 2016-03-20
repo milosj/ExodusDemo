@@ -75,5 +75,8 @@
 - (IBAction)switchDidSwitch:(UISwitch *)sender {
     [self.scene setShowSymbols:sender.isOn];
 }
+- (IBAction)trailsSwitchDidSwitch:(UISwitch *)sender {
+    self.scene.showTrails = sender.isOn;
+}
 
 @end

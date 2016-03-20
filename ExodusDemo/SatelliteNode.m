@@ -17,6 +17,7 @@
 
 @property (strong, nonatomic) SKLabelNode* label;
 @property (strong, nonatomic) SKShapeNode* shape;
+@property (strong, nonatomic) SKShapeNode* shadow;
 
 
 @end
@@ -30,9 +31,17 @@
         self.physicsBody.affectedByGravity = NO;
         self.physicsBody.dynamic = NO;
         self.label = [SKLabelNode labelNodeWithFontNamed:@"Helvetica"];
+        self.label.fontColor = [UIColor blackColor];
         [self addChild:self.label];
         self.shape = [SKShapeNode shapeNodeWithCircleOfRadius:5];
         [self addChild:self.shape];
+        self.shadow = [self.shape copy];
+        self.shadow.yScale = 0.75;
+        self.shadow.xScale = 1.25;
+        self.shadow.fillColor = [UIColor lightGrayColor];
+        self.isCastingShadow = YES;
+//        self.shadow.position = CGPointMake(self.shape.position.x-5,self.shape.position.y+5);
+        [self addChild:self.shadow];
         self.isShowingSymbol = NO;
         self.shape.strokeColor = [UIColor clearColor];
         self.satellites = [NSMutableArray new];
@@ -54,7 +63,7 @@
 
 - (void)setMass:(CGFloat)mass {
     self.physicsBody.mass = mass;
-    self.label.fontSize = MIN(MAX(2*unitsPerAU, 4.5*unitsPerAU*mass), 90);
+    self.label.fontSize = MIN(MAX(unitsPerAU/4, unitsPerAU/2*mass), 7*unitsPerAU/10);
     self.label.position = CGPointMake(0, -CGRectGetMidY(self.label.calculateAccumulatedFrame));
     SKShapeNode* oldShape = self.shape;
     [self.shape removeFromParent];
@@ -62,6 +71,22 @@
     self.shape.fillColor = oldShape.fillColor;
     self.shape.strokeColor = [UIColor clearColor];
     [self addChild:self.shape];
+    
+    SKNode* oldShadow = self.shadow;
+
+    self.shadow = [self.shape copy];
+    self.shadow.yScale = 0.95;
+    self.shadow.xScale = 0.95;
+    self.shadow.hidden = oldShadow.hidden;
+    self.shadow.fillColor = [UIColor darkGrayColor];
+    self.shadow.strokeColor = [UIColor lightGrayColor];
+    self.shadow.position = CGPointMake(self.shape.position.x-self.spriteRadius,self.shape.position.y-self.spriteRadius);
+    self.shadow.zPosition = -10;
+    self.shadow.alpha = 0.15;
+        [oldShadow removeFromParent];
+    [self addChild:self.shadow];
+
+    
 }
 
 - (CGFloat)spriteRadius {
@@ -74,7 +99,7 @@
 
 - (void)setColour:(UIColor *)colour {
     self.shape.fillColor = colour;
-    self.label.fontColor = colour;
+//    self.label.fontColor = colour;
 }
 
 - (CGFloat)solarMass {
@@ -89,6 +114,13 @@
     self.shape.hidden = isShowingSymbol;
 }
 
+- (BOOL)isCastingShadow {
+    return !self.shadow.isHidden;
+}
+
+- (void)setIsCastingShadow:(BOOL)isCastingShadow {
+    self.shadow.hidden = !isCastingShadow;
+}
 - (void)update:(long int)time {
     for (SatelliteNode* satellite in self.satellites) {
         [self update:time forBody:self andSatellite:satellite];
@@ -96,8 +128,16 @@
 }
 
 - (void)update:(long int)time forBody:(SatelliteNode*)body andSatellite:(SatelliteNode*)satellite {
+//    satellite.shadow.position = satellite.shape.position;
+//    satellite.shadow.zRotation = atan((satellite.position.y-body.position.y)/(satellite.position.x-body.position.x));
     
     CGFloat d = [self distanceBetween:body and:satellite];
+    CGFloat xcos = (satellite.position.x-body.position.x)/d;
+    CGFloat ycos = (satellite.position.y-body.position.y)/d;
+    satellite.shadow.position = CGPointMake(0.9*satellite.spriteRadius*(xcos), 0.8*satellite.spriteRadius*(ycos-1));
+    satellite.shadow.zRotation = atan((satellite.position.y-body.position.y)/(satellite.position.x-body.position.x));
+//    satellite.shadow.xScale = MAX(0.25,xcos);
+    satellite.shadow.yScale = MIN(0.85,MAX(0.25,ABS(ycos)));
     
     if (d < 0.01 || d > 100*unitsPerAU) {
         NSLog(@"crazy orbit %@ in %@", satellite, self);
@@ -153,5 +193,13 @@
     clone.position = self.position;
     clone.isShowingSymbol = self.isShowingSymbol;
     return clone;
+}
+
+- (SKNode*)trailNode {
+    SKShapeNode* trailNode = [self.shape copy];
+    trailNode.position = self.position;
+    trailNode.hidden = NO;
+    trailNode.alpha = 0.15f;
+    return trailNode;
 }
 @end

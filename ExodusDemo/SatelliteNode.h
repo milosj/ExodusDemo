@@ -14,6 +14,8 @@
 @property (strong, nonatomic) UIColor* colour;
 @property (assign, atomic) BOOL isShowingSymbol;
 @property (assign, readonly, nonatomic) CGFloat spriteRadius;
+@property (weak, readonly, nonatomic) SKNode* trailNode;
+@property (assign, nonatomic) BOOL isCastingShadow;
 
 @property (assign, nonatomic) CGFloat mass;
 @property (assign, readonly, nonatomic) CGFloat solarMass;
