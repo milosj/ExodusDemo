@@ -32,9 +32,13 @@
     GameScene *scene = [GameScene nodeWithFileNamed:@"GameScene"];
     scene.scaleMode = SKSceneScaleModeAspectFill;
     self.scene = scene;
-    
     // Present the scene.
     [skView presentScene:scene];
+    
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
 }
 
 - (BOOL)shouldAutorotate
@@ -57,11 +61,16 @@
     // Release any cached data, images, etc that aren't in use.
 }
 
+- (void)viewWillLayoutSubviews {
+    [super viewWillLayoutSubviews];
+    self.scene.size = self.view.bounds.size;
+}
+
 - (BOOL)prefersStatusBarHidden {
     return YES;
 }
 - (IBAction)sliderDidSlide:(UISlider *)sender {
-    self.scene.zoom = sender.maximumValue - sender.value;
+    self.scene.zoom = MAX(floor(sender.value), 1);
 }
 - (IBAction)switchDidSwitch:(UISwitch *)sender {
     [self.scene setShowSymbols:sender.isOn];

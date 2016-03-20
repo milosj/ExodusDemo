@@ -54,7 +54,7 @@
 
 - (void)setMass:(CGFloat)mass {
     self.physicsBody.mass = mass;
-    self.label.fontSize = MIN(MAX(20, 45*mass), 90);
+    self.label.fontSize = MIN(MAX(2*unitsPerAU, 4.5*unitsPerAU*mass), 90);
     self.label.position = CGPointMake(0, -CGRectGetMidY(self.label.calculateAccumulatedFrame));
     SKShapeNode* oldShape = self.shape;
     [self.shape removeFromParent];

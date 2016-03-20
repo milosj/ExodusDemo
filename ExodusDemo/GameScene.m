@@ -37,12 +37,14 @@
     self.backgroundColor = [UIColor whiteColor];
     
     SKCameraNode* cameraNode = [SKCameraNode new];
-    cameraNode.position = CGPointMake(self.size.width / 2, self.size.height / 2);
     [self addChild:cameraNode];
     self.camera = cameraNode;
-    
+    cameraNode.position = CGPointZero;//CGPointMake(self.size.width / 2, self.size.height / 2);
+
     self.scale = 1.0f;
-    self.zoom = 5.5f;
+    SKAction* zoomInAction =  [SKAction scaleTo:8 duration:0];//fabs(oldScale - zoom)];
+    [self.camera runAction:zoomInAction];
+//    self.zoom = 5.5f;
     
     self.physicsWorld.gravity = CGVectorMake(0, 0);
     
@@ -50,8 +52,7 @@
     
     myLabel.text = @"Hello, World!";
     myLabel.fontSize = 25;
-    myLabel.position = CGPointMake(CGRectGetMidX(self.frame),
-                                   CGRectGetMidY(self.frame)/2);
+    myLabel.position = CGPointZero;
     self.label = myLabel;
     
     [self addChild:myLabel];
@@ -59,14 +60,30 @@
     self.satellites = [NSMutableArray new];
     self.trails = [NSMutableDictionary new];
     
+    
+    SatelliteNode *sun = [SatelliteNode new];
+    sun.text = @"☉";
+    sun.position = CGPointZero;//CGPointMake(CGRectGetMidX(self.view.frame),
+                               //CGRectGetMidY(self.view.frame));
+    sun.mass = 333000.0f;
+    sun.colour = [UIColor colorWithRed:0.97 green:1.00 blue:0.16 alpha:1.0];
+    [self addChild:sun];
+    self.sun = sun;
+    self.sun.zPosition = -1;
+    self.sun.satellites = self.satellites;
+    self.time = 1;
+    
+    
+    
     SatelliteNode *mercury = [SatelliteNode new];
     mercury.name = @"Mercury";
     mercury.text = @"☿";
-    mercury.position = CGPointMake(CGRectGetMidX(self.frame)-390,
-                                 CGRectGetMidY(self.frame));
-    mercury.initialPosition = mercury.position;
     mercury.mass = 0.055f;
     mercury.orbitLength = 88;
+    mercury.orbitRadius = 390;
+    mercury.position = CGPointMake(self.sun.position.x-mercury.orbitRadius,
+                                 self.sun.position.y);
+    mercury.initialPosition = mercury.position;
     mercury.colour = [UIColor colorWithRed:0.77 green:0.66 blue:0.56 alpha:1.0];
     [self addChild:mercury];
     [self.satellites addObject:mercury];
@@ -78,11 +95,12 @@
     SatelliteNode *venus = [SatelliteNode new];
     venus.text = @"♀";
     venus.name = @"Venus";
-    venus.position = CGPointMake(CGRectGetMidX(self.frame)-723,
-                                 CGRectGetMidY(self.frame));
-    venus.initialPosition = venus.position;
     venus.mass = 0.815f;
     venus.orbitLength = 225;
+    venus.orbitRadius = 723;
+    venus.position = CGPointMake(self.sun.position.x-venus.orbitRadius,
+                                 self.sun.position.y);
+    venus.initialPosition = venus.position;
     venus.colour = [UIColor colorWithRed:0.96 green:0.95 blue:0.57 alpha:1.0];
     [self addChild:venus];
     [self.satellites addObject:venus];
@@ -92,12 +110,12 @@
     self.trails[venus.name] = [NSMutableArray new];
     
     SatelliteNode* earth = [SatelliteNode new];
-    CGFloat earthD = 1016.7;
+    earth.orbitRadius = 1016.7;
     earth.text = @"♁";
     earth.name = @"Earth";
     earth.orbitLength = 365;
-    earth.position = CGPointMake(CGRectGetMidX(self.frame)-earthD,
-                                   CGRectGetMidY(self.frame));
+    earth.position = CGPointMake(self.sun.position.x-earth.orbitRadius,
+                                   self.sun.position.y);
     earth.initialPosition = earth.position;
     earth.mass = 1.0f;
     earth.colour = [UIColor colorWithRed:0.03 green:0.84 blue:1.00 alpha:1.0];
@@ -112,11 +130,12 @@
     luna.text = @"☽";
     luna.name = @"Luna";
     luna.orbitLength = 20;
-    luna.position = CGPointMake(-2.654, 0);
+    luna.orbitRadius = 2.654;
+    luna.position = CGPointMake(earth.position.x-luna.orbitRadius, earth.position.y);
     luna.initialPosition = luna.position;
     luna.mass = 0.0123;
     luna.colour = [UIColor colorWithRed:0.80 green:0.85 blue:0.89 alpha:1.0];
-    [earth addChild:luna];
+    [self addChild:luna];
     [earth.satellites addObject:luna];
     luna.initialVector = CGVectorMake(0, -1000*5.88e-4);
     luna.inertialVector = luna.initialVector;
@@ -126,8 +145,9 @@
     mars.text = @"♂";
     mars.name = @"Mars";
     mars.orbitLength = 687;
-    mars.position = CGPointMake(CGRectGetMidX(self.frame)-1524,
-                                 CGRectGetMidY(self.frame));
+    mars.orbitRadius = 1524;
+    mars.position = CGPointMake(self.sun.position.x-mars.orbitRadius,
+                                 self.sun.position.y);
     mars.initialPosition = mars.position;
     mars.mass = 0.107f;
     mars.colour = [UIColor colorWithRed:0.83 green:0.34 blue:0.30 alpha:1.0];
@@ -139,17 +159,7 @@
     self.trails[mars.name] = [NSMutableArray new];
     
     
-    SatelliteNode *sun = [SatelliteNode new];
-    sun.text = @"☉";
-    sun.position = CGPointMake(CGRectGetMidX(self.frame),
-                                 CGRectGetMidY(self.frame));
-    sun.mass = 333000.0f;
-    sun.colour = [UIColor colorWithRed:0.97 green:1.00 blue:0.16 alpha:1.0];
-    [self addChild:sun];
-    self.sun = sun;
-    self.sun.zPosition = -1;
-    self.sun.satellites = self.satellites;
-    self.time = 1;
+
 }
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
@@ -203,10 +213,17 @@
 }
 
 - (void)setZoom:(CGFloat)zoom {
-    CGFloat oldScale = self.scale;
-    self.scale = zoom;
-    SKAction* zoomInAction =  [SKAction scaleTo:zoom duration:fabs(oldScale - zoom)];
-    [self.camera runAction:zoomInAction];
+    
+    int i = (int)zoom;
+    SatelliteNode* satellite = self.satellites[i-1];
+    CGFloat lesserDimension = MIN(self.view.bounds.size.width, self.view.bounds.size.height);
+    CGFloat zoomRatio = 2*satellite.orbitRadius/lesserDimension+1;
+    if (self.scale != zoomRatio) {
+        CGFloat oldScale = self.scale;
+        self.scale = zoomRatio;
+        SKAction* zoomInAction =  [SKAction scaleTo:zoomRatio duration:fabs(oldScale - zoom)/10];
+        [self.camera runAction:zoomInAction];
+    }
 }
 
 - (void)setShowSymbols:(BOOL)showSymbols {

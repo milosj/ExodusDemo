@@ -21,6 +21,7 @@
 @property (assign, nonatomic) CGPoint initialPosition;
 @property (assign, nonatomic) CGVector initialVector;
 @property (assign, nonatomic) int orbitLength;
+@property (assign, nonatomic) CGFloat orbitRadius;
 
 @property (strong, nonatomic) NSMutableArray<SatelliteNode*>* satellites;;
 
