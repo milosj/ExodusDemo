@@ -31,7 +31,10 @@
 @property (assign, atomic) BOOL privateShowTrails;
 @property (assign, nonatomic) long int trailTime;
 
-@property (strong, nonatomic) dispatch_queue_t zoomQueue;
+@property (strong, nonatomic) NSMutableArray<SKAction*>* zoomQueue;
+
+@property (weak, nonatomic) SatelliteNode* selectedNode;
+
 
 @end
 
@@ -41,8 +44,7 @@
     /* Setup your scene here */
     self.backgroundColor = [UIColor whiteColor];
     self.showTrails = YES;
-    
-    self.zoomQueue = dispatch_queue_create("com.abvgd.exodus.zoom", DISPATCH_QUEUE_SERIAL);
+    self.zoomQueue = [NSMutableArray new];
     
     SKCameraNode* cameraNode = [SKCameraNode new];
     [self addChild:cameraNode];
@@ -164,13 +166,98 @@
     self.trails[mars.name] = [NSMutableArray new];
     
     
+    SatelliteNode* jupiter = [SatelliteNode new];
+    jupiter.text = @"♃";
+    jupiter.name = @"Jupiter";
+    jupiter.orbitLength = 4333;
+    jupiter.orbitRadius = 5430;
+    jupiter.position = CGPointMake(self.sun.position.x-jupiter.orbitRadius, self.sun.position.y);
+    jupiter.initialPosition = jupiter.position;
+    jupiter.mass = 317.828;
+    jupiter.colour = [UIColor colorWithRed:0.87 green:0.46 blue:0.00 alpha:1.0];
+    [self addChild:jupiter];
+    jupiter.initialVector = CGVectorMake(0, -7.54);
+    jupiter.inertialVector = jupiter.initialVector;
+    [self.satellites addObject:jupiter];
+    self.trails[jupiter.name] = [NSMutableArray new];
+    
+    SatelliteNode* saturn = [SatelliteNode new];
+    saturn.text = @"♄";
+    saturn.name = @"Saturn";
+    saturn.orbitLength = 107556;
+    saturn.orbitRadius = 10020;
+    saturn.position = CGPointMake(self.sun.position.x-saturn.orbitRadius, self.sun.position.y);
+    saturn.initialPosition = saturn.position;
+    saturn.mass = 95.16;
+    saturn.colour = [UIColor colorWithRed:0.84 green:0.78 blue:0.50 alpha:1.0];
+    saturn.initialVector = CGVectorMake(0, -5.57);
+    saturn.inertialVector = saturn.initialVector;
+    [self addChild:saturn];
+    [self.satellites addObject:saturn];
+    self.trails[saturn.name] = [NSMutableArray new];
+    
+    SatelliteNode* uranus = [SatelliteNode new];
+    uranus.text = @"♅";
+    uranus.name = @"Uranus";
+    uranus.orbitLength = 30687;
+    uranus.orbitRadius = 19970;
+    uranus.position = CGPointMake(self.sun.position.x-uranus.orbitRadius, self.sun.position.y);
+    uranus.initialPosition = uranus.position;
+    uranus.mass = 14.535;
+    uranus.colour = [UIColor colorWithRed:0.36 green:0.78 blue:0.92 alpha:1.0];
+    uranus.initialVector = CGVectorMake(0, -3.92);
+    uranus.inertialVector = uranus.initialVector;
+    [self addChild:uranus];
+    [self.satellites addObject:uranus];
+    self.trails[uranus.name] = [NSMutableArray new];
+    
+    SatelliteNode* neptune = [SatelliteNode new];
+    neptune.text = @"♆";
+    neptune.name = @"Neptune";
+    neptune.orbitLength = 60190;
+    neptune.orbitRadius = 29960;
+    neptune.position = CGPointMake(self.sun.position.x-neptune.orbitRadius, self.sun.position.y);
+    neptune.initialPosition = neptune.position;
+    neptune.mass = 17.14878;
+    neptune.colour = [UIColor colorWithRed:0.23 green:0.22 blue:1.00 alpha:1.0];
+    neptune.initialVector = CGVectorMake(0, -3.14);
+    neptune.inertialVector = neptune.initialVector;
+    [self addChild:neptune];
+    [self.satellites addObject:neptune];
+    self.trails[neptune.name] = [NSMutableArray new];
+    
     self.scale = 0.128;
-    self.zoom = 4;
+    self.zoom = 5;
 
 }
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     /* Called when a touch begins */
+    
+    if (event.type == UIEventTypeTouches && touches.count == 1) {
+        UITouch* touch = touches.anyObject;
+        CGPoint point = [touch locationInNode:self];
+        NSArray<SKNode*>* touchedNodes = [self nodesAtPoint:point];
+        BOOL found = NO;
+        for (SKNode* node in touchedNodes) {
+            if (!found && [node isKindOfClass:[SatelliteNode class]]) {
+                self.camera.position = node.position;
+                self.selectedNode = (SatelliteNode*)node;
+                found = YES;
+                
+                if ([self.satellites containsObject:(SatelliteNode*)node]) {
+                    int i = (int)[self.satellites indexOfObject:(SatelliteNode*)node];
+                    self.zoom = i+1;
+                }
+            }
+        }
+        if (!found) {
+            self.selectedNode = nil;
+            self.camera.position = self.sun.position;
+            self.zoom = self.satellites.count;
+        }
+    }
+    
 //    for (UITouch *touch in touches) {
 //        CGPoint location = [touch locationInNode:self];
 //        
@@ -199,13 +286,18 @@
                 SKNode* trail = satellite.trailNode;
                 [self addChild:trail];
                 [self.trails[satellite.name] insertObject:trail atIndex:0];
-                if (self.trails[satellite.name].count > satellite.orbitLength) {
-                    [[self.trails[satellite.name] lastObject] removeFromParent];
-                    [self.trails[satellite.name] removeLastObject];
-                }
+//                if (self.trails[satellite.name].count > satellite.orbitLength) {
+//                    [[self.trails[satellite.name] lastObject] removeFromParent];
+//                    [self.trails[satellite.name] removeLastObject];
+//                }
             }
         }
         [self.sun update:self.time];
+        
+        if (self.selectedNode) {
+            self.camera.position = self.selectedNode.position;
+        }
+        
         self.time++;
         if (self.showTrails) {
             self.trailTime++;
@@ -220,7 +312,8 @@
 }
 
 - (void)setZoom:(CGFloat)zoom {
-    dispatch_async(self.zoomQueue, ^{
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
         int i = (int)zoom;
         SatelliteNode* satellite = self.satellites[i-1];
         CGFloat lesserDimension = MIN(self.view.bounds.size.width, self.view.bounds.size.height);
@@ -228,16 +321,35 @@
         if (self.scale != zoomRatio) {
             CGFloat oldScale = self.scale;
             self.scale = zoomRatio;
-            SKAction* zoomInAction =  [SKAction scaleTo:zoomRatio duration:fabs(oldScale - zoom)/10];
-            dispatch_semaphore_t semaphore = dispatch_semaphore_create(101);
-
-            [self.camera runAction:zoomInAction completion:^{
-                dispatch_semaphore_signal(semaphore);
-            }];
-            dispatch_semaphore_wait(semaphore, 0);
+            SKAction* zoomInAction =  [SKAction scaleTo:zoomRatio duration:MIN(0.5f,fabs(oldScale - zoomRatio)/10)];
+//            NSLog(@"z %f-%f %f in %@", oldScale, zoomRatio, fabs(oldScale - zoomRatio)/10, zoomInAction);
+            if (self.zoomQueue.count == 0) {
+                [self.zoomQueue addObject:zoomInAction];
+                [self performNextActionInQueue:self.zoomQueue withCamera:self.camera];
+//                NSLog(@"p-- %@", zoomInAction);
+            } else {
+                [self.zoomQueue addObject:zoomInAction];
+            }
         }
     });
 }
+
+- (void)performNextActionInQueue:(NSMutableArray<SKAction*>*)queue withCamera:(SKCameraNode*)zoomCamera {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (queue.count) {
+            SKAction* lastAction = queue.lastObject;
+            [queue removeAllObjects];
+            [queue addObject:lastAction];
+            [zoomCamera runAction:lastAction completion:^{
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [queue removeObject:lastAction];
+//                    NSLog(@"p- %@", lastAction);
+                    [self performNextActionInQueue:queue withCamera:zoomCamera];
+                });
+            }];
+        }
+    });
+};
 
 - (void)setShowSymbols:(BOOL)showSymbols {
     dispatch_async(dispatch_get_main_queue(), ^{
