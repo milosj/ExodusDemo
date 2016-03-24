@@ -16,6 +16,7 @@
 @property (assign, readonly, nonatomic) CGFloat spriteRadius;
 @property (weak, readonly, nonatomic) SKNode* trailNode;
 @property (assign, nonatomic) BOOL isCastingShadow;
+@property (strong, nonatomic) SKNode* overlayShape;
 
 @property (assign, nonatomic) CGFloat mass;
 @property (assign, readonly, nonatomic) CGFloat solarMass;

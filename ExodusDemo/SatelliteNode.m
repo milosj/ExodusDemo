@@ -19,7 +19,6 @@
 @property (strong, nonatomic) SKShapeNode* shape;
 @property (strong, nonatomic) SKShapeNode* shadow;
 
-
 @end
 
 @implementation SatelliteNode
@@ -45,6 +44,10 @@
         self.isShowingSymbol = NO;
         self.shape.strokeColor = [UIColor clearColor];
         self.satellites = [NSMutableArray new];
+
+        self.overlayShape = [SKLabelNode labelNodeWithText:@"?"];
+        ((SKLabelNode*)self.overlayShape).fontColor = [UIColor blackColor];
+        
     }
     return self;
 }
@@ -55,6 +58,7 @@
 
 - (void)setText:(NSString *)text {
     self.label.text = text;
+    ((SKLabelNode*)self.overlayShape).text = text;
 }
 
 - (CGFloat)mass {
@@ -63,17 +67,25 @@
 
 - (void)setMass:(CGFloat)mass {
     self.physicsBody.mass = mass;
-    self.label.fontSize = MIN(MAX(unitsPerAU/4, unitsPerAU/2*mass), 7*unitsPerAU/10);
+    
+    self.label.fontSize = MIN(MAX(unitsPerAU*4, unitsPerAU/2*mass), 7*unitsPerAU/3);
     self.label.position = CGPointMake(0, -CGRectGetMidY(self.label.calculateAccumulatedFrame));
+    
     SKShapeNode* oldShape = self.shape;
-    [self.shape removeFromParent];
     self.shape = [SKShapeNode shapeNodeWithCircleOfRadius:[self spriteRadius]];
     self.shape.fillColor = oldShape.fillColor;
     self.shape.strokeColor = [UIColor clearColor];
+    [self.shape removeFromParent];
     [self addChild:self.shape];
     
+//    SKShapeNode* oldOverlayShape = self.overlayShape;
+//    SKNode* cameraNode = oldOverlayShape.parent;
+//    self.overlayShape = [SKShapeNode shapeNodeWithCircleOfRadius:[self spriteRadius]];
+//    self.overlayShape.strokeColor = [UIColor blackColor];
+//    [oldOverlayShape removeFromParent];
+//    [cameraNode addChild:self.overlayShape];
+    
     SKNode* oldShadow = self.shadow;
-
     self.shadow = [self.shape copy];
     self.shadow.yScale = 0.95;
     self.shadow.xScale = 0.95;
@@ -90,7 +102,7 @@
 }
 
 - (CGFloat)spriteRadius {
-    return MIN(4*unitsPerAU/10,MAX(2, 5*unitsPerAU/100+unitsPerAU/100*log(self.mass)));
+    return MIN(4*unitsPerAU/10,MAX(5, 5*unitsPerAU/100+unitsPerAU/100*log(self.mass)));
 }
 
 - (UIColor*)colour {
@@ -174,6 +186,7 @@
     
     
     satellite.position = CGPointMake(newex, newey);
+    
     satellite.inertialVector = CGVectorMake(dx, dy);
     
     
@@ -199,7 +212,7 @@
     SKShapeNode* trailNode = [self.shape copy];
     trailNode.position = self.position;
     trailNode.hidden = NO;
-    trailNode.alpha = 0.15f;
+    trailNode.alpha = 0.5f;
     return trailNode;
 }
 @end

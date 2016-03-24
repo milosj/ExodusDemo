@@ -34,7 +34,10 @@
 @property (strong, nonatomic) NSMutableArray<SKAction*>* zoomQueue;
 
 @property (weak, nonatomic) SatelliteNode* selectedNode;
+@property (assign, atomic) BOOL isPositioningCamera;
 
+@property (strong, nonatomic) SKNode* overlay;
+@property (strong, nonatomic) NSMutableArray<SKNode*>* overlaySatellites;
 
 @end
 
@@ -43,7 +46,7 @@
 -(void)didMoveToView:(SKView *)view {
     /* Setup your scene here */
     self.backgroundColor = [UIColor whiteColor];
-    self.showTrails = YES;
+    self.showTrails = NO;
     self.zoomQueue = [NSMutableArray new];
     
     SKCameraNode* cameraNode = [SKCameraNode new];
@@ -52,14 +55,14 @@
     cameraNode.position = CGPointZero;//CGPointMake(self.size.width / 2, self.size.height / 2);
 
     
+    self.overlay = [SKNode new];
+    [cameraNode addChild:self.overlay];
+    self.overlay.position = CGPointZero;
+    self.overlay.zPosition = 1;
+    self.overlaySatellites = [NSMutableArray new];
+    
     self.physicsWorld.gravity = CGVectorMake(0, 0);
     
-    SKLabelNode *myLabel = [SKLabelNode labelNodeWithFontNamed:@"Ariel"];
-    
-    myLabel.text = @"";
-    myLabel.fontSize = 25;
-    myLabel.position = CGPointZero;
-    self.label = myLabel;
     
 //    [self addChild:myLabel];
 
@@ -226,6 +229,41 @@
     [self.satellites addObject:neptune];
     self.trails[neptune.name] = [NSMutableArray new];
     
+    
+//    [self.satellites removeAllObjects];
+    SatelliteNode* pluto = [SatelliteNode new];
+    pluto.text = @"♇";
+    pluto.name = @"Pluto";
+    pluto.orbitLength = 90553;
+    pluto.orbitRadius = 49305;
+    pluto.position = CGPointMake(self.sun.position.x-pluto.orbitRadius, self.sun.position.y);
+    pluto.initialPosition = pluto.position;
+    pluto.mass = 0.002192;
+    pluto.colour = [UIColor colorWithRed:0.80 green:0.85 blue:0.00 alpha:1.0];
+    pluto.initialVector = CGVectorMake(0, -2.143);
+    pluto.inertialVector = pluto.initialVector;
+    [self addChild:pluto];
+    [self.satellites addObject:pluto];
+    self.trails[pluto.name] = [NSMutableArray new];
+    
+
+    SKShapeNode* (^createOrbitalCircle)(SatelliteNode*) = ^(SatelliteNode* satellite){
+        SKShapeNode* orbit = [SKShapeNode shapeNodeWithCircleOfRadius:satellite.orbitRadius];
+        orbit.position = sun.position;
+        orbit.strokeColor = satellite.colour;
+        orbit.alpha = 0.2f;
+        orbit.fillColor = [UIColor clearColor];
+        orbit.lineWidth = MAX(100,4*satellite.spriteRadius);
+        return orbit;
+    };
+    
+    for (SatelliteNode* satellite in self.satellites) {
+        [self addChild:createOrbitalCircle(satellite)];
+        [self.overlaySatellites addObject:satellite.overlayShape];
+        [self.overlay addChild:satellite.overlayShape];
+    }
+    [self.overlay addChild:sun.overlayShape];
+    
     self.scale = 0.128;
     self.zoom = 5;
 
@@ -234,65 +272,68 @@
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     /* Called when a touch begins */
     
-    if (event.type == UIEventTypeTouches && touches.count == 1) {
+    if (!self.isPositioningCamera && event.type == UIEventTypeTouches && touches.count == 1) {
         UITouch* touch = touches.anyObject;
         CGPoint point = [touch locationInNode:self];
         NSArray<SKNode*>* touchedNodes = [self nodesAtPoint:point];
         BOOL found = NO;
+        SKNode* targetNode = nil;
+        int targetZoomLevel = 0;
         for (SKNode* node in touchedNodes) {
-            if (!found && [node isKindOfClass:[SatelliteNode class]]) {
-                self.camera.position = node.position;
-                self.selectedNode = (SatelliteNode*)node;
+            if (!found && [node isKindOfClass:[SatelliteNode class]] && node != self.selectedNode) {
+                
                 found = YES;
+                targetNode = node;
+                targetZoomLevel = 4;
                 
                 if ([self.satellites containsObject:(SatelliteNode*)node]) {
-                    int i = (int)[self.satellites indexOfObject:(SatelliteNode*)node];
-                    self.zoom = i+1;
+                    self.zoom = (int)[self.satellites indexOfObject:(SatelliteNode*)node]+1;
                 }
+                
+                break;
             }
         }
         if (!found) {
             self.selectedNode = nil;
-            self.camera.position = self.sun.position;
+            targetNode = self.sun;
+            targetZoomLevel = (int) self.satellites.count;
             self.zoom = self.satellites.count;
         }
+        self.isPositioningCamera = YES;
+        SKAction* positionCamera = [SKAction moveTo:targetNode.position duration:0.6f];
+        [self.camera runAction:positionCamera completion:^{
+            self.zoom = targetZoomLevel;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self.selectedNode = (SatelliteNode*)targetNode;
+                self.isPositioningCamera = NO;
+            });
+        }];
+        
     }
-    
-//    for (UITouch *touch in touches) {
-//        CGPoint location = [touch locationInNode:self];
-//        
-//        SKSpriteNode *sprite = [SKSpriteNode spriteNodeWithImageNamed:@"Spaceship"];
-//        
-//        sprite.xScale = 0.5;
-//        sprite.yScale = 0.5;
-//        sprite.position = location;
-//        
-//        SKAction *action = [SKAction rotateByAngle:M_PI duration:1];
-//        
-//        [sprite runAction:[SKAction repeatActionForever:action]];
-//        
-//        [self addChild:sprite];
-//    }
+
 }
 
 -(void)update:(CFTimeInterval)currentTime {
     /* Called before each frame is rendered */
     if (currentTime > self.nextUpdateTime) {
-        self.nextUpdateTime = currentTime + 0.05f;
+        self.nextUpdateTime = currentTime + 0.005f;
         for (SatelliteNode* satellite in self.satellites) {
-            SKNode* previousTrail = [self.trails[satellite.name] firstObject];
-
-            if (self.showTrails && (!previousTrail || ( self.trailTime < satellite.orbitLength && sqrt(pow(previousTrail.position.x-satellite.position.x,2)+pow(previousTrail.position.y-satellite.position.y,2))>2*satellite.spriteRadius))) {
-                SKNode* trail = satellite.trailNode;
-                [self addChild:trail];
-                [self.trails[satellite.name] insertObject:trail atIndex:0];
-//                if (self.trails[satellite.name].count > satellite.orbitLength) {
-//                    [[self.trails[satellite.name] lastObject] removeFromParent];
-//                    [self.trails[satellite.name] removeLastObject];
-//                }
-            }
+//            SKNode* previousTrail = [self.trails[satellite.name] firstObject];
+//            if (self.showTrails && (!previousTrail || ( self.trailTime < satellite.orbitLength && sqrt(pow(previousTrail.position.x-satellite.position.x,2)+pow(previousTrail.position.y-satellite.position.y,2))>2*satellite.spriteRadius))) {
+//                SKNode* trail = satellite.trailNode;
+//                [self addChild:trail];
+//                [self.trails[satellite.name] insertObject:trail atIndex:0];
+////                if (self.trails[satellite.name].count > satellite.orbitLength) {
+////                    [[self.trails[satellite.name] lastObject] removeFromParent];
+////                    [self.trails[satellite.name] removeLastObject];
+////                }
+//            }
         }
         [self.sun update:self.time];
+        for (SatelliteNode* satellite in self.satellites) {
+            satellite.overlayShape.position = [self convertPoint:satellite.position toNode:self.camera];
+        }
+        self.sun.overlayShape.position = [self convertPoint:self.sun.position toNode:self.camera];
         
         if (self.selectedNode) {
             self.camera.position = self.selectedNode.position;
