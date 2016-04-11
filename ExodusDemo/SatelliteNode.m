@@ -11,6 +11,7 @@
 #define kG 0.0172021
 #define kSquared kG*kG
 #define unitsPerAU 1000
+#define timeResolution 1
 
 
 @interface SatelliteNode()
@@ -44,10 +45,11 @@
         self.isShowingSymbol = NO;
         self.shape.strokeColor = [UIColor clearColor];
         self.satellites = [NSMutableArray new];
+        self.positions = [NSMutableArray new];
+        self.inertialVectors = [NSMutableArray new];
 
         self.overlayShape = [SKLabelNode labelNodeWithText:@"?"];
         ((SKLabelNode*)self.overlayShape).fontColor = [UIColor blackColor];
-        
     }
     return self;
 }
@@ -133,16 +135,26 @@
 - (void)setIsCastingShadow:(BOOL)isCastingShadow {
     self.shadow.hidden = !isCastingShadow;
 }
-- (void)update:(long int)time {
+- (void)update:(CFTimeInterval)time {
     for (SatelliteNode* satellite in self.satellites) {
         [self update:time forBody:self andSatellite:satellite];
     }
 }
 
-- (void)update:(long int)time forBody:(SatelliteNode*)body andSatellite:(SatelliteNode*)satellite {
+- (void)update:(CFTimeInterval)time forBody:(SatelliteNode*)body andSatellite:(SatelliteNode*)satellite {
 //    satellite.shadow.position = satellite.shape.position;
 //    satellite.shadow.zRotation = atan((satellite.position.y-body.position.y)/(satellite.position.x-body.position.x));
     
+    if (satellite.orbitalPeriod == 0) {
+        return;
+    }
+    
+    int timeIndex = (int)fmod(floorf(time*timeResolution), satellite.orbitalPeriod);
+    int nextTimeIndex = timeIndex+1;
+    if (nextTimeIndex > satellite.orbitalPeriod) {
+        nextTimeIndex = 0;
+    }
+
     CGFloat d = [self distanceBetween:body and:satellite];
     CGFloat xcos = (satellite.position.x-body.position.x)/d;
     CGFloat ycos = (satellite.position.y-body.position.y)/d;
@@ -151,11 +163,17 @@
 //    satellite.shadow.xScale = MAX(0.25,xcos);
     satellite.shadow.yScale = MIN(0.85,MAX(0.25,ABS(ycos)));
     
+    if (satellite.positions.count > timeIndex) {
+        satellite.position = [satellite.positions[timeIndex] CGPointValue];
+        satellite.inertialVector = [satellite.inertialVectors[timeIndex] CGVectorValue];
+        return;
+    }
+    
     if (d < 0.01 || d > 100*unitsPerAU) {
         NSLog(@"crazy orbit %@ in %@", satellite, self);
         return;
     }
-    if (time+1 % satellite.orbitLength == 0  ) {
+    if (time+1 % satellite.orbitalPeriod == 0  ) {
         satellite.position = CGPointMake(0.5*(satellite.initialPosition.x+satellite.position.x),0.5*(satellite.initialPosition.y+satellite.position.y));
         satellite.inertialVector = satellite.initialVector;
     }
@@ -186,10 +204,12 @@
     
     
     satellite.position = CGPointMake(newex, newey);
-    
     satellite.inertialVector = CGVectorMake(dx, dy);
     
+    [satellite.positions addObject:[NSValue valueWithCGPoint:satellite.position]];
+    [satellite.inertialVectors addObject:[NSValue valueWithCGVector:satellite.inertialVector]];
     
+    NSLog(@"time %f orbital day %d (%.2f,%.2f)", time, timeIndex, satellite.position.x, satellite.position.y);
     //        NSLog([NSString stringWithFormat:@"d %.6f g %.6f g(%.6f, %.6f), e'(%.6f, %.6f), v'(%.6f, %.6f)",d, g, gx, gy, newex, newey, dx, dy]);
 }
 

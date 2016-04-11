@@ -63,8 +63,11 @@
     
     self.physicsWorld.gravity = CGVectorMake(0, 0);
     
-    
-//    [self addChild:myLabel];
+    self.label = [SKLabelNode labelNodeWithText:@"--"];
+    self.label.fontColor = [UIColor blackColor];
+    self.label.position = CGPointMake(CGRectGetMidX(self.overlay.frame), CGRectGetMaxY(self.overlay.frame));
+    self.label.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeLeft;
+    [self.overlay addChild:self.label];
 
     self.satellites = [NSMutableArray new];
     self.trails = [NSMutableDictionary new];
@@ -73,6 +76,7 @@
     SatelliteNode *sun = [SatelliteNode new];
     sun.isCastingShadow = NO;
     sun.text = @"☉";
+    sun.name = @"Sun";
     sun.position = CGPointZero;//CGPointMake(CGRectGetMidX(self.view.frame),
                                //CGRectGetMidY(self.view.frame));
     sun.mass = 333000.0f;
@@ -89,7 +93,7 @@
     mercury.name = @"Mercury";
     mercury.text = @"☿";
     mercury.mass = 0.055f;
-    mercury.orbitLength = 88;
+    mercury.orbitalPeriod = 88;
     mercury.orbitRadius = 390;
     mercury.position = CGPointMake(self.sun.position.x-mercury.orbitRadius,
                                  self.sun.position.y);
@@ -106,14 +110,14 @@
     venus.text = @"♀";
     venus.name = @"Venus";
     venus.mass = 0.815f;
-    venus.orbitLength = 225;
+    venus.orbitalPeriod = 225;
     venus.orbitRadius = 723;
     venus.position = CGPointMake(self.sun.position.x-venus.orbitRadius,
                                  self.sun.position.y);
     venus.initialPosition = venus.position;
     venus.colour = [UIColor colorWithRed:0.96 green:0.95 blue:0.57 alpha:1.0];
     [self addChild:venus];
-    [self.satellites addObject:venus];
+//    [self.satellites addObject:venus];
     venus.initialVector = CGVectorMake(0, -20.2f);
     venus.inertialVector = venus.initialVector;
     self.venus = venus;
@@ -123,7 +127,7 @@
     earth.orbitRadius = 1016.7;
     earth.text = @"♁";
     earth.name = @"Earth";
-    earth.orbitLength = 365;
+    earth.orbitalPeriod = 365;
     earth.position = CGPointMake(self.sun.position.x-earth.orbitRadius,
                                    self.sun.position.y);
     earth.initialPosition = earth.position;
@@ -133,13 +137,13 @@
     self.earth = earth;
     earth.initialVector = CGVectorMake(0, -16.92);
     earth.inertialVector = earth.initialVector;
-    [self.satellites addObject:self.earth];
+//    [self.satellites addObject:self.earth];
     self.trails[earth.name] = [NSMutableArray new];
     
     SatelliteNode* luna = [SatelliteNode new];
     luna.text = @"☽";
     luna.name = @"Luna";
-    luna.orbitLength = 20;
+    luna.orbitalPeriod = 20;
     luna.orbitRadius = 2.654;
     luna.position = CGPointMake(earth.position.x-luna.orbitRadius, earth.position.y);
     luna.initialPosition = luna.position;
@@ -154,7 +158,7 @@
     SatelliteNode* mars = [SatelliteNode new];
     mars.text = @"♂";
     mars.name = @"Mars";
-    mars.orbitLength = 687;
+    mars.orbitalPeriod = 687;
     mars.orbitRadius = 1524;
     mars.position = CGPointMake(self.sun.position.x-mars.orbitRadius,
                                  self.sun.position.y);
@@ -165,14 +169,14 @@
     self.mars = mars;
     mars.initialVector = CGVectorMake(0, -13.90);
     mars.inertialVector = mars.initialVector;
-    [self.satellites addObject:self.mars];
+//    [self.satellites addObject:self.mars];
     self.trails[mars.name] = [NSMutableArray new];
     
     
     SatelliteNode* jupiter = [SatelliteNode new];
     jupiter.text = @"♃";
     jupiter.name = @"Jupiter";
-    jupiter.orbitLength = 4333;
+    jupiter.orbitalPeriod = 4333;
     jupiter.orbitRadius = 5430;
     jupiter.position = CGPointMake(self.sun.position.x-jupiter.orbitRadius, self.sun.position.y);
     jupiter.initialPosition = jupiter.position;
@@ -181,13 +185,13 @@
     [self addChild:jupiter];
     jupiter.initialVector = CGVectorMake(0, -7.54);
     jupiter.inertialVector = jupiter.initialVector;
-    [self.satellites addObject:jupiter];
+//    [self.satellites addObject:jupiter];
     self.trails[jupiter.name] = [NSMutableArray new];
     
     SatelliteNode* saturn = [SatelliteNode new];
     saturn.text = @"♄";
     saturn.name = @"Saturn";
-    saturn.orbitLength = 107556;
+    saturn.orbitalPeriod = 107556;
     saturn.orbitRadius = 10020;
     saturn.position = CGPointMake(self.sun.position.x-saturn.orbitRadius, self.sun.position.y);
     saturn.initialPosition = saturn.position;
@@ -196,13 +200,13 @@
     saturn.initialVector = CGVectorMake(0, -5.57);
     saturn.inertialVector = saturn.initialVector;
     [self addChild:saturn];
-    [self.satellites addObject:saturn];
+//    [self.satellites addObject:saturn];
     self.trails[saturn.name] = [NSMutableArray new];
     
     SatelliteNode* uranus = [SatelliteNode new];
     uranus.text = @"♅";
     uranus.name = @"Uranus";
-    uranus.orbitLength = 30687;
+    uranus.orbitalPeriod = 30687;
     uranus.orbitRadius = 19970;
     uranus.position = CGPointMake(self.sun.position.x-uranus.orbitRadius, self.sun.position.y);
     uranus.initialPosition = uranus.position;
@@ -211,13 +215,13 @@
     uranus.initialVector = CGVectorMake(0, -3.92);
     uranus.inertialVector = uranus.initialVector;
     [self addChild:uranus];
-    [self.satellites addObject:uranus];
+//    [self.satellites addObject:uranus];
     self.trails[uranus.name] = [NSMutableArray new];
     
     SatelliteNode* neptune = [SatelliteNode new];
     neptune.text = @"♆";
     neptune.name = @"Neptune";
-    neptune.orbitLength = 60190;
+    neptune.orbitalPeriod = 60190;
     neptune.orbitRadius = 29960;
     neptune.position = CGPointMake(self.sun.position.x-neptune.orbitRadius, self.sun.position.y);
     neptune.initialPosition = neptune.position;
@@ -226,7 +230,7 @@
     neptune.initialVector = CGVectorMake(0, -3.14);
     neptune.inertialVector = neptune.initialVector;
     [self addChild:neptune];
-    [self.satellites addObject:neptune];
+//    [self.satellites addObject:neptune];
     self.trails[neptune.name] = [NSMutableArray new];
     
     
@@ -234,7 +238,7 @@
     SatelliteNode* pluto = [SatelliteNode new];
     pluto.text = @"♇";
     pluto.name = @"Pluto";
-    pluto.orbitLength = 90553;
+    pluto.orbitalPeriod = 90553;
     pluto.orbitRadius = 49305;
     pluto.position = CGPointMake(self.sun.position.x-pluto.orbitRadius, self.sun.position.y);
     pluto.initialPosition = pluto.position;
@@ -243,7 +247,7 @@
     pluto.initialVector = CGVectorMake(0, -2.143);
     pluto.inertialVector = pluto.initialVector;
     [self addChild:pluto];
-    [self.satellites addObject:pluto];
+//    [self.satellites addObject:pluto];
     self.trails[pluto.name] = [NSMutableArray new];
     
 
@@ -258,7 +262,7 @@
     };
     
     for (SatelliteNode* satellite in self.satellites) {
-        [self addChild:createOrbitalCircle(satellite)];
+//        [self addChild:createOrbitalCircle(satellite)];
         [self.overlaySatellites addObject:satellite.overlayShape];
         [self.overlay addChild:satellite.overlayShape];
     }
@@ -314,9 +318,11 @@
 }
 
 -(void)update:(CFTimeInterval)currentTime {
+    
     /* Called before each frame is rendered */
     if (currentTime > self.nextUpdateTime) {
         self.nextUpdateTime = currentTime + 0.005f;
+        self.label.text = [NSString stringWithFormat:@"%.2f", currentTime];
         for (SatelliteNode* satellite in self.satellites) {
 //            SKNode* previousTrail = [self.trails[satellite.name] firstObject];
 //            if (self.showTrails && (!previousTrail || ( self.trailTime < satellite.orbitLength && sqrt(pow(previousTrail.position.x-satellite.position.x,2)+pow(previousTrail.position.y-satellite.position.y,2))>2*satellite.spriteRadius))) {
@@ -329,11 +335,26 @@
 ////                }
 //            }
         }
-        [self.sun update:self.time];
+        [self.sun update:currentTime];
+        
+        
+        
         for (SatelliteNode* satellite in self.satellites) {
-            satellite.overlayShape.position = [self convertPoint:satellite.position toNode:self.camera];
+            if (self.scale < 30) {
+                satellite.overlayShape.hidden = YES;
+            } else {
+                satellite.overlayShape.hidden = NO;
+                CGPoint convertedPosition = [self convertPoint:satellite.position toNode:self.camera];
+                satellite.overlayShape.position = CGPointMake(convertedPosition.x, convertedPosition.y-12.0f);
+            }
         }
-        self.sun.overlayShape.position = [self convertPoint:self.sun.position toNode:self.camera];
+        if (self.scale < 30) {
+            self.sun.overlayShape.hidden = YES;
+        } else {
+            self.sun.overlayShape.hidden = NO;
+            CGPoint convertedPosition = [self convertPoint:self.sun.position toNode:self.camera];
+            self.sun.overlayShape.position = CGPointMake(convertedPosition.x, convertedPosition.y-12.0f);
+        }
         
         if (self.selectedNode) {
             self.camera.position = self.selectedNode.position;
@@ -356,6 +377,9 @@
     
     dispatch_async(dispatch_get_main_queue(), ^{
         int i = (int)zoom;
+        if (i > self.satellites.count) {
+            i = self.satellites.count;
+        }
         SatelliteNode* satellite = self.satellites[i-1];
         CGFloat lesserDimension = MIN(self.view.bounds.size.width, self.view.bounds.size.height);
         CGFloat zoomRatio = 2*satellite.orbitRadius/lesserDimension+1;

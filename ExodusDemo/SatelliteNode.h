@@ -23,11 +23,13 @@
 @property (assign, nonatomic) CGVector inertialVector;
 @property (assign, nonatomic) CGPoint initialPosition;
 @property (assign, nonatomic) CGVector initialVector;
-@property (assign, nonatomic) int orbitLength;
+@property (assign, nonatomic) long int orbitalPeriod;
 @property (assign, nonatomic) CGFloat orbitRadius;
 
-@property (strong, nonatomic) NSMutableArray<SatelliteNode*>* satellites;;
+@property (strong, nonatomic) NSMutableArray<SatelliteNode*>* satellites;
+@property (strong, nonatomic) NSMutableArray<NSValue*>* positions;
+@property (strong, nonatomic) NSMutableArray<NSValue*>* inertialVectors;
 
-- (void)update:(long int)time;
+- (void)update:(CFTimeInterval)time;
 
 @end
