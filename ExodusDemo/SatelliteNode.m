@@ -149,12 +149,6 @@
         return;
     }
     
-    int timeIndex = (int)fmod(floorf(time*timeResolution), satellite.orbitalPeriod);
-    int nextTimeIndex = timeIndex+1;
-    if (nextTimeIndex > satellite.orbitalPeriod) {
-        nextTimeIndex = 0;
-    }
-
     CGFloat d = [self distanceBetween:body and:satellite];
     CGFloat xcos = (satellite.position.x-body.position.x)/d;
     CGFloat ycos = (satellite.position.y-body.position.y)/d;
@@ -163,26 +157,83 @@
 //    satellite.shadow.xScale = MAX(0.25,xcos);
     satellite.shadow.yScale = MIN(0.85,MAX(0.25,ABS(ycos)));
     
-    if (satellite.positions.count > timeIndex) {
-        satellite.position = [satellite.positions[timeIndex] CGPointValue];
+    satellite.position = [self positionAtTime:time forSatellite:satellite orbitingBody:body];
+    satellite.inertialVector = [satellite.inertialVectors[[self timeIndexFromTime:time forSatellite:satellite]] CGVectorValue];
+}
+
+- (int)timeIndexFromTime:(CFTimeInterval)time forSatellite:(SatelliteNode*)satellite {
+    int timeIndex = (int)fmod(floorf(time), satellite.orbitalPeriod);
+    return timeIndex;
+}
+
+- (int)previousTimeIndexFromTime:(CFTimeInterval)time forSatellite:(SatelliteNode*)satellite {
+    int previousTimeIndex = [self timeIndexFromTime:time forSatellite:satellite]-1;
+    return previousTimeIndex;
+}
+
+- (int)nextTimeIndexFromTime:(CFTimeInterval)time forSatellite:(SatelliteNode*)satellite {
+    int nextTimeIndex = [self timeIndexFromTime:time forSatellite:satellite]+1;
+    if (nextTimeIndex >= satellite.orbitalPeriod) {
+        nextTimeIndex = 0;
+    }
+    return nextTimeIndex;
+}
+
+
+- (CGPoint)positionAtTime:(CFTimeInterval)time forSatellite:(SatelliteNode*)satellite orbitingBody:(SatelliteNode*)body {
+    CGPoint satellitePosition;
+
+    int timeIndex = [self timeIndexFromTime:time forSatellite:satellite];
+    int nextTimeIndex = [self nextTimeIndexFromTime:time forSatellite:satellite];
+    int previousTimeIndex = [self previousTimeIndexFromTime:time forSatellite:satellite];
+    
+    CGFloat timescale = time-floorf(time);
+    
+    CGFloat d = [self distanceBetween:body and:satellite];
+    
+    if (satellite.positions.count == satellite.orbitalPeriod) {
+        CGPoint (^scaledPosition)(CGPoint, CGPoint, CGFloat) = ^CGPoint(CGPoint a, CGPoint b, CGFloat scale){
+            CGFloat x = scale*(b.x-a.x);
+            CGFloat y = scale*(b.y-a.y);
+            return CGPointMake(a.x+x, a.y+y);
+        };
+//        CGPoint oldpos = satellite.position;
+        satellitePosition = scaledPosition([satellite.positions[timeIndex] CGPointValue],
+                                            [satellite.positions[nextTimeIndex] CGPointValue],
+                                            timescale);
+//        CGFloat d = sqrt(pow(satellite.position.x-oldpos.x, 2)+pow(satellite.position.y-oldpos.y,2));
+//        NSLog(@"%.3f (%d) ->%.4f  [%.2f] %.2f,%.2f -> %.2f,%.2f / %.2f,%.2f", time, timeIndex, d, timescale, oldpos.x, oldpos.y, satellite.position.x, satellite.position.y);
         satellite.inertialVector = [satellite.inertialVectors[timeIndex] CGVectorValue];
-        return;
+        return satellitePosition;
+    } else if (satellite.positions.count > timeIndex) {
+        [[NSException exceptionWithName:@"SatellitePositionAtTimeException" reason:@"No satellite position at timeIndex" userInfo:@{@"satellite":satellite, @"body":body, @"timeIndex":[NSNumber numberWithInt:timeIndex]}] raise];
+        return CGPointZero;
     }
     
     if (d < 0.01 || d > 100*unitsPerAU) {
-        NSLog(@"crazy orbit %@ in %@", satellite, self);
-        return;
-    }
-    if (time+1 % satellite.orbitalPeriod == 0  ) {
-        satellite.position = CGPointMake(0.5*(satellite.initialPosition.x+satellite.position.x),0.5*(satellite.initialPosition.y+satellite.position.y));
-        satellite.inertialVector = satellite.initialVector;
+        [[NSException exceptionWithName:@"SatellitePositionDistanceException" reason:@"Invalid distance between body and satellite" userInfo:@{@"satellite":satellite, @"body":body, @"distance":[NSNumber numberWithFloat:d]}] raise];
+        return CGPointZero;
     }
     
-    CGVector dv = satellite.inertialVector;
+    
+    
+    CGVector dv;
+    if (previousTimeIndex == -1) {
+        dv = satellite.initialVector;
+    } else {
+        dv = [satellite.inertialVectors[previousTimeIndex] CGVectorValue];
+    }
+    CGPoint previousSatellitePosition;
+    if (previousTimeIndex == -1) {
+        previousSatellitePosition = satellite.initialPosition;
+    } else {
+        previousSatellitePosition = [satellite.positions[previousTimeIndex] CGPointValue];
+    }
+    
     CGFloat g = kSquared/pow(d/unitsPerAU,3); //gaussian gravitational constant squared times 1 solar mass over radius in AU cubed
     
-    CGFloat gx = g*(body.position.x-satellite.position.x)/unitsPerAU;
-    CGFloat gy = g*(body.position.y-satellite.position.y)/unitsPerAU;
+    CGFloat gx = g*(body.position.x-previousSatellitePosition.x)/unitsPerAU;
+    CGFloat gy = g*(body.position.y-previousSatellitePosition.y)/unitsPerAU;
     
     if (isnan(gy)) {
         gy = 0;
@@ -191,8 +242,8 @@
         gx = 0;
     }
     
-    CGFloat ex = satellite.position.x;
-    CGFloat ey = satellite.position.y;
+    CGFloat ex = previousSatellitePosition.x;
+    CGFloat ey = previousSatellitePosition.y;
     
     
     CGFloat dx = unitsPerAU*gx + dv.dx;
@@ -203,14 +254,24 @@
     
     
     
-    satellite.position = CGPointMake(newex, newey);
-    satellite.inertialVector = CGVectorMake(dx, dy);
+    satellitePosition = CGPointMake(newex, newey);
+//    satellite.inertialVector = CGVectorMake(dx, dy);
     
-    [satellite.positions addObject:[NSValue valueWithCGPoint:satellite.position]];
-    [satellite.inertialVectors addObject:[NSValue valueWithCGVector:satellite.inertialVector]];
+    [satellite.positions addObject:[NSValue valueWithCGPoint:satellitePosition]];
+    [satellite.inertialVectors addObject:[NSValue valueWithCGVector:CGVectorMake(dx, dy)]];
     
-    NSLog(@"time %f orbital day %d (%.2f,%.2f)", time, timeIndex, satellite.position.x, satellite.position.y);
-    //        NSLog([NSString stringWithFormat:@"d %.6f g %.6f g(%.6f, %.6f), e'(%.6f, %.6f), v'(%.6f, %.6f)",d, g, gx, gy, newex, newey, dx, dy]);
+//    NSLog(@"%@ at %d (%.2f,%.2f)", satellite.name, timeIndex, satellitePosition.x, satellitePosition.y);
+    
+    return satellitePosition;
+}
+
+- (void)precalculateOrbits {
+    for (SatelliteNode* satellite in self.satellites) {
+        for (long int t=0; t<satellite.orbitalPeriod; t++) {
+            [self positionAtTime:t forSatellite:satellite orbitingBody:self];
+        }
+        NSLog(@"Precalculated %@", satellite.name);
+    }
 }
 
 -(CGFloat)distanceBetween:(SKNode*)objectA and:(SKNode*)objectB {

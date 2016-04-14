@@ -13,6 +13,8 @@
 
 @interface GameScene()
 
+@property (assign, atomic) BOOL isRunning;
+
 @property (strong, nonatomic) SatelliteNode* sun;
 @property (strong, nonatomic) SatelliteNode* mercury;
 @property (strong, nonatomic) SatelliteNode* venus;
@@ -27,6 +29,7 @@
 @property (strong, nonatomic) NSMutableDictionary<NSString*, NSMutableArray<SKNode*>*>* trails;
 
 @property (assign, atomic) long int time;
+@property (assign, atomic) CFTimeInterval startingTime;
 
 @property (assign, atomic) BOOL privateShowTrails;
 @property (assign, nonatomic) long int trailTime;
@@ -44,6 +47,9 @@
 @implementation GameScene
 
 -(void)didMoveToView:(SKView *)view {
+    
+    self.startingTime = 0;
+    
     /* Setup your scene here */
     self.backgroundColor = [UIColor whiteColor];
     self.showTrails = NO;
@@ -117,7 +123,7 @@
     venus.initialPosition = venus.position;
     venus.colour = [UIColor colorWithRed:0.96 green:0.95 blue:0.57 alpha:1.0];
     [self addChild:venus];
-//    [self.satellites addObject:venus];
+    [self.satellites addObject:venus];
     venus.initialVector = CGVectorMake(0, -20.2f);
     venus.inertialVector = venus.initialVector;
     self.venus = venus;
@@ -137,7 +143,7 @@
     self.earth = earth;
     earth.initialVector = CGVectorMake(0, -16.92);
     earth.inertialVector = earth.initialVector;
-//    [self.satellites addObject:self.earth];
+    [self.satellites addObject:self.earth];
     self.trails[earth.name] = [NSMutableArray new];
     
     SatelliteNode* luna = [SatelliteNode new];
@@ -169,7 +175,7 @@
     self.mars = mars;
     mars.initialVector = CGVectorMake(0, -13.90);
     mars.inertialVector = mars.initialVector;
-//    [self.satellites addObject:self.mars];
+    [self.satellites addObject:self.mars];
     self.trails[mars.name] = [NSMutableArray new];
     
     
@@ -200,7 +206,7 @@
     saturn.initialVector = CGVectorMake(0, -5.57);
     saturn.inertialVector = saturn.initialVector;
     [self addChild:saturn];
-//    [self.satellites addObject:saturn];
+    [self.satellites addObject:saturn];
     self.trails[saturn.name] = [NSMutableArray new];
     
     SatelliteNode* uranus = [SatelliteNode new];
@@ -215,7 +221,7 @@
     uranus.initialVector = CGVectorMake(0, -3.92);
     uranus.inertialVector = uranus.initialVector;
     [self addChild:uranus];
-//    [self.satellites addObject:uranus];
+    [self.satellites addObject:uranus];
     self.trails[uranus.name] = [NSMutableArray new];
     
     SatelliteNode* neptune = [SatelliteNode new];
@@ -230,7 +236,7 @@
     neptune.initialVector = CGVectorMake(0, -3.14);
     neptune.inertialVector = neptune.initialVector;
     [self addChild:neptune];
-//    [self.satellites addObject:neptune];
+    [self.satellites addObject:neptune];
     self.trails[neptune.name] = [NSMutableArray new];
     
     
@@ -271,6 +277,11 @@
     self.scale = 0.128;
     self.zoom = 5;
 
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        [self.sun precalculateOrbits];
+        self.isRunning = YES;
+    });
+    
 }
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
@@ -318,51 +329,56 @@
 }
 
 -(void)update:(CFTimeInterval)currentTime {
-    
-    /* Called before each frame is rendered */
-    if (currentTime > self.nextUpdateTime) {
-        self.nextUpdateTime = currentTime + 0.005f;
-        self.label.text = [NSString stringWithFormat:@"%.2f", currentTime];
-        for (SatelliteNode* satellite in self.satellites) {
-//            SKNode* previousTrail = [self.trails[satellite.name] firstObject];
-//            if (self.showTrails && (!previousTrail || ( self.trailTime < satellite.orbitLength && sqrt(pow(previousTrail.position.x-satellite.position.x,2)+pow(previousTrail.position.y-satellite.position.y,2))>2*satellite.spriteRadius))) {
-//                SKNode* trail = satellite.trailNode;
-//                [self addChild:trail];
-//                [self.trails[satellite.name] insertObject:trail atIndex:0];
-////                if (self.trails[satellite.name].count > satellite.orbitLength) {
-////                    [[self.trails[satellite.name] lastObject] removeFromParent];
-////                    [self.trails[satellite.name] removeLastObject];
-////                }
-//            }
+    if (self.isRunning) {
+        
+        if (self.startingTime == 0) {
+            self.startingTime = currentTime;
         }
-        [self.sun update:currentTime];
-        
-        
-        
-        for (SatelliteNode* satellite in self.satellites) {
-            if (self.scale < 30) {
-                satellite.overlayShape.hidden = YES;
-            } else {
-                satellite.overlayShape.hidden = NO;
-                CGPoint convertedPosition = [self convertPoint:satellite.position toNode:self.camera];
-                satellite.overlayShape.position = CGPointMake(convertedPosition.x, convertedPosition.y-12.0f);
+        /* Called before each frame is rendered */
+        if (currentTime > self.nextUpdateTime) {
+            self.nextUpdateTime = currentTime + 1.0f/60.0f;
+            self.label.text = [NSString stringWithFormat:@"%.2f", currentTime];
+            for (SatelliteNode* satellite in self.satellites) {
+    //            SKNode* previousTrail = [self.trails[satellite.name] firstObject];
+    //            if (self.showTrails && (!previousTrail || ( self.trailTime < satellite.orbitLength && sqrt(pow(previousTrail.position.x-satellite.position.x,2)+pow(previousTrail.position.y-satellite.position.y,2))>2*satellite.spriteRadius))) {
+    //                SKNode* trail = satellite.trailNode;
+    //                [self addChild:trail];
+    //                [self.trails[satellite.name] insertObject:trail atIndex:0];
+    ////                if (self.trails[satellite.name].count > satellite.orbitLength) {
+    ////                    [[self.trails[satellite.name] lastObject] removeFromParent];
+    ////                    [self.trails[satellite.name] removeLastObject];
+    ////                }
+    //            }
             }
-        }
-        if (self.scale < 30) {
-            self.sun.overlayShape.hidden = YES;
-        } else {
-            self.sun.overlayShape.hidden = NO;
-            CGPoint convertedPosition = [self convertPoint:self.sun.position toNode:self.camera];
-            self.sun.overlayShape.position = CGPointMake(convertedPosition.x, convertedPosition.y-12.0f);
-        }
-        
-        if (self.selectedNode) {
-            self.camera.position = self.selectedNode.position;
-        }
-        
-        self.time++;
-        if (self.showTrails) {
-            self.trailTime++;
+            [self.sun update:10*(currentTime-self.startingTime)];
+            
+            
+            
+            for (SatelliteNode* satellite in self.satellites) {
+                if (self.scale < 30) {
+                    satellite.overlayShape.hidden = YES;
+                } else {
+                    satellite.overlayShape.hidden = NO;
+                    CGPoint convertedPosition = [self convertPoint:satellite.position toNode:self.camera];
+                    satellite.overlayShape.position = CGPointMake(convertedPosition.x, convertedPosition.y-12.0f);
+                }
+            }
+            if (self.scale < 30) {
+                self.sun.overlayShape.hidden = YES;
+            } else {
+                self.sun.overlayShape.hidden = NO;
+                CGPoint convertedPosition = [self convertPoint:self.sun.position toNode:self.camera];
+                self.sun.overlayShape.position = CGPointMake(convertedPosition.x, convertedPosition.y-12.0f);
+            }
+            
+            if (self.selectedNode) {
+                self.camera.position = self.selectedNode.position;
+            }
+            
+            self.time++;
+            if (self.showTrails) {
+                self.trailTime++;
+            }
         }
     }
 }

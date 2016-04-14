@@ -31,5 +31,6 @@
 @property (strong, nonatomic) NSMutableArray<NSValue*>* inertialVectors;
 
 - (void)update:(CFTimeInterval)time;
+- (void)precalculateOrbits;
 
 @end
