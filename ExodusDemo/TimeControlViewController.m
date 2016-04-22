@@ -37,13 +37,14 @@
 - (void)didSlide {
     if (self.slideEnabled) {
         for (NSObject<TimeSliderDelegate>* delegate in self.delegates) {
-            [delegate timeSliderValueDidChange:self.timeSlider.value-0.5f*self.timeSlider.value];
+            [delegate timeSliderValueDidChange:MAX(self.timeSlider.value-0.5f*self.timeSlider.value, 1)];
         }
     }
 }
 
 - (void)slidingDidStart {
     self.slideEnabled = YES;
+    [self didSlide];
 }
 
 - (void)slidingDidStop {

@@ -79,7 +79,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="100" height="50"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="40" translatesAutoresizingMaskIntoConstraints="NO" id="3mX-hx-Oa2">
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="20" translatesAutoresizingMaskIntoConstraints="NO" id="3mX-hx-Oa2">
                                 <rect key="frame" x="-2" y="10" width="104" height="31"/>
                                 <connections>
                                     <action selector="sliderDidChange:" destination="mV5-rd-Hbf" eventType="valueChanged" id="i4A-uz-WFC"/>
