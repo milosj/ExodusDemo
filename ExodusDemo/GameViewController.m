@@ -8,10 +8,12 @@
 
 #import "GameViewController.h"
 #import "GameScene.h"
+#import "TimeControlViewController.h"
 
 @interface GameViewController()
 
 @property (strong, nonatomic) GameScene* scene;
+@property (weak, nonatomic) TimeControlViewController* timeControl;
 
 @end
 
@@ -35,6 +37,9 @@
     // Present the scene.
     [skView presentScene:scene];
     
+    if (self.timeControl) {
+        [self.timeControl addDelegate:scene];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -69,6 +74,19 @@
 - (BOOL)prefersStatusBarHidden {
     return YES;
 }
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    [super prepareForSegue:segue sender:sender];
+    if ([segue.destinationViewController isKindOfClass:[TimeControlViewController class]]) {
+        TimeControlViewController* tcvc = (TimeControlViewController*)segue.destinationViewController;
+        self.timeControl = tcvc;
+        if (self.scene) {
+            [tcvc addDelegate:self.scene];
+        }
+        
+    }
+}
+
 - (IBAction)sliderDidSlide:(UISlider *)sender {
     self.scene.zoom = MAX(round(sender.maximumValue - sender.value), 1);
 }

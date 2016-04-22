@@ -39,10 +39,22 @@
                                     <action selector="trailsSwitchDidSwitch:" destination="BV1-FR-VrT" eventType="valueChanged" id="412-f7-oXV"/>
                                 </connections>
                             </switch>
+                            <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dJa-dH-5fW">
+                                <rect key="frame" x="500" y="550" width="100" height="50"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="100" id="8Vm-t2-4K1"/>
+                                    <constraint firstAttribute="height" constant="50" id="NOo-bj-rvN"/>
+                                </constraints>
+                                <connections>
+                                    <segue destination="mV5-rd-Hbf" kind="embed" id="ora-m3-Hos"/>
+                                </connections>
+                            </containerView>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="qBv-ts-rS4" firstAttribute="leading" secondItem="3se-qz-xqx" secondAttribute="leading" constant="20" symbolic="YES" id="GDc-E5-zEa"/>
+                            <constraint firstAttribute="trailing" secondItem="dJa-dH-5fW" secondAttribute="trailing" id="aU8-2g-NoZ"/>
+                            <constraint firstItem="qHh-Mt-9TT" firstAttribute="top" secondItem="dJa-dH-5fW" secondAttribute="bottom" id="gcA-CZ-sWt"/>
                             <constraint firstItem="bYg-eG-PHh" firstAttribute="leading" secondItem="vkq-u1-3fd" secondAttribute="trailing" constant="8" id="lLa-gD-Ciy"/>
                             <constraint firstItem="vkq-u1-3fd" firstAttribute="leading" secondItem="qBv-ts-rS4" secondAttribute="trailing" constant="8" id="pbK-Kx-wC8"/>
                             <constraint firstItem="qHh-Mt-9TT" firstAttribute="top" secondItem="qBv-ts-rS4" secondAttribute="bottom" constant="8" symbolic="YES" id="rVG-TM-DQZ"/>
@@ -53,6 +65,46 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SZV-WD-TEh" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="305" y="319"/>
+        </scene>
+        <!--Time Control View Controller-->
+        <scene sceneID="zSJ-lu-QGa">
+            <objects>
+                <viewController id="mV5-rd-Hbf" customClass="TimeControlViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="l8h-11-hEv"/>
+                        <viewControllerLayoutGuide type="bottom" id="m4s-Qy-h3r"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="iRs-eq-9eN">
+                        <rect key="frame" x="0.0" y="0.0" width="100" height="50"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="40" translatesAutoresizingMaskIntoConstraints="NO" id="3mX-hx-Oa2">
+                                <rect key="frame" x="-2" y="10" width="104" height="31"/>
+                                <connections>
+                                    <action selector="sliderDidChange:" destination="mV5-rd-Hbf" eventType="valueChanged" id="i4A-uz-WFC"/>
+                                    <action selector="sliderTouchDown:" destination="mV5-rd-Hbf" eventType="touchDown" id="D0t-fA-BoD"/>
+                                    <action selector="sliderTouchUpInside:" destination="mV5-rd-Hbf" eventType="touchUpInside" id="20p-a2-i0h"/>
+                                    <action selector="sliderTouchUpOutside:" destination="mV5-rd-Hbf" eventType="touchUpOutside" id="mTG-Zw-A8u"/>
+                                </connections>
+                            </slider>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <gestureRecognizers/>
+                        <constraints>
+                            <constraint firstAttribute="bottom" secondItem="3mX-hx-Oa2" secondAttribute="bottom" constant="10" id="IMk-HJ-FtL"/>
+                            <constraint firstAttribute="trailing" secondItem="3mX-hx-Oa2" secondAttribute="trailing" id="Rbo-1c-YgX"/>
+                            <constraint firstItem="3mX-hx-Oa2" firstAttribute="top" secondItem="iRs-eq-9eN" secondAttribute="top" constant="10" id="XKI-NA-0UE"/>
+                            <constraint firstItem="3mX-hx-Oa2" firstAttribute="leading" secondItem="iRs-eq-9eN" secondAttribute="leading" id="vek-8Q-WNH"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="timeSlider" destination="3mX-hx-Oa2" id="lLb-nR-ygl"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="fni-ho-Upx" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="627" y="791"/>
         </scene>
     </scenes>
 </document>

@@ -16,6 +16,7 @@
 		071CD81D1C89341F00E9B27F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 071CD81C1C89341F00E9B27F /* Assets.xcassets */; };
 		071CD8201C89341F00E9B27F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 071CD81E1C89341F00E9B27F /* LaunchScreen.storyboard */; };
 		0735D9611C9B800500043363 /* SatelliteNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 0735D9601C9B800500043363 /* SatelliteNode.m */; };
+		07B0AEEF1CC01CA600770294 /* TimeControlViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 07B0AEEE1CC01CA600770294 /* TimeControlViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +35,8 @@
 		071CD8211C89341F00E9B27F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0735D95F1C9B800500043363 /* SatelliteNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SatelliteNode.h; sourceTree = "<group>"; };
 		0735D9601C9B800500043363 /* SatelliteNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SatelliteNode.m; sourceTree = "<group>"; };
+		07B0AEED1CC01CA600770294 /* TimeControlViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimeControlViewController.h; sourceTree = "<group>"; };
+		07B0AEEE1CC01CA600770294 /* TimeControlViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TimeControlViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,6 +83,8 @@
 				071CD81E1C89341F00E9B27F /* LaunchScreen.storyboard */,
 				071CD8211C89341F00E9B27F /* Info.plist */,
 				071CD80B1C89341F00E9B27F /* Supporting Files */,
+				07B0AEED1CC01CA600770294 /* TimeControlViewController.h */,
+				07B0AEEE1CC01CA600770294 /* TimeControlViewController.m */,
 			);
 			path = ExodusDemo;
 			sourceTree = "<group>";
@@ -164,6 +169,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				071CD8181C89341F00E9B27F /* GameViewController.m in Sources */,
+				07B0AEEF1CC01CA600770294 /* TimeControlViewController.m in Sources */,
 				071CD8101C89341F00E9B27F /* AppDelegate.m in Sources */,
 				071CD8131C89341F00E9B27F /* GameScene.m in Sources */,
 				0735D9611C9B800500043363 /* SatelliteNode.m in Sources */,

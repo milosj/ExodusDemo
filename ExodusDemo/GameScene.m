@@ -9,7 +9,7 @@
 #import "GameScene.h"
 #import "SatelliteNode.h"
 
-
+#define timeCompressionMinimalChangeFactor 0.1
 
 @interface GameScene()
 
@@ -41,6 +41,10 @@
 
 @property (strong, nonatomic) SKNode* overlay;
 @property (strong, nonatomic) NSMutableArray<SKNode*>* overlaySatellites;
+
+@property (assign, nonatomic) CGFloat actualTimeCompression;
+@property (assign, nonatomic) CGFloat targetTimeCompression;
+
 
 @end
 
@@ -92,9 +96,7 @@
     self.sun.zPosition = -1;
     self.sun.satellites = self.satellites;
     self.time = 1;
-    
-    
-    
+  
     SatelliteNode *mercury = [SatelliteNode new];
     mercury.name = @"Mercury";
     mercury.text = @"☿";
@@ -276,6 +278,8 @@
     
     self.scale = 0.128;
     self.zoom = 5;
+    self.actualTimeCompression = 0.0f;
+    self.targetTimeCompression = self.actualTimeCompression;
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         [self.sun precalculateOrbits];
@@ -335,22 +339,23 @@
             self.startingTime = currentTime;
         }
         /* Called before each frame is rendered */
-        if (currentTime > self.nextUpdateTime) {
-            self.nextUpdateTime = currentTime + 1.0f/60.0f;
+        if (currentTime > self.nextUpdateTime && self.actualTimeCompression > 0) {
+            self.nextUpdateTime = currentTime ;//+ self.actualTimeCompression*1.0f/60.0f;
             self.label.text = [NSString stringWithFormat:@"%.2f", currentTime];
-            for (SatelliteNode* satellite in self.satellites) {
-    //            SKNode* previousTrail = [self.trails[satellite.name] firstObject];
-    //            if (self.showTrails && (!previousTrail || ( self.trailTime < satellite.orbitLength && sqrt(pow(previousTrail.position.x-satellite.position.x,2)+pow(previousTrail.position.y-satellite.position.y,2))>2*satellite.spriteRadius))) {
-    //                SKNode* trail = satellite.trailNode;
-    //                [self addChild:trail];
-    //                [self.trails[satellite.name] insertObject:trail atIndex:0];
-    ////                if (self.trails[satellite.name].count > satellite.orbitLength) {
-    ////                    [[self.trails[satellite.name] lastObject] removeFromParent];
-    ////                    [self.trails[satellite.name] removeLastObject];
-    ////                }
-    //            }
-            }
-            [self.sun update:10*(currentTime-self.startingTime)];
+            
+//            for (SatelliteNode* satellite in self.satellites) {
+//    //            SKNode* previousTrail = [self.trails[satellite.name] firstObject];
+//    //            if (self.showTrails && (!previousTrail || ( self.trailTime < satellite.orbitLength && sqrt(pow(previousTrail.position.x-satellite.position.x,2)+pow(previousTrail.position.y-satellite.position.y,2))>2*satellite.spriteRadius))) {
+//    //                SKNode* trail = satellite.trailNode;
+//    //                [self addChild:trail];
+//    //                [self.trails[satellite.name] insertObject:trail atIndex:0];
+//    ////                if (self.trails[satellite.name].count > satellite.orbitLength) {
+//    ////                    [[self.trails[satellite.name] lastObject] removeFromParent];
+//    ////                    [self.trails[satellite.name] removeLastObject];
+//    ////                }
+//    //            }
+//            }
+            [self.sun update:self.time];
             
             
             
@@ -375,9 +380,18 @@
                 self.camera.position = self.selectedNode.position;
             }
             
-            self.time++;
+            self.time += self.actualTimeCompression;
             if (self.showTrails) {
-                self.trailTime++;
+                self.trailTime += self.actualTimeCompression;
+            }
+        }
+        if (fabs(self.targetTimeCompression-self.actualTimeCompression) < 1) {
+            self.actualTimeCompression = self.targetTimeCompression;
+        } else {
+            if (self.actualTimeCompression < self.targetTimeCompression) {
+                self.actualTimeCompression += MAX(timeCompressionMinimalChangeFactor*self.actualTimeCompression, 0.1f);
+            } else if (self.actualTimeCompression > self.targetTimeCompression) {
+                self.actualTimeCompression -= MAX(timeCompressionMinimalChangeFactor*self.actualTimeCompression, 0.1f);
             }
         }
     }
@@ -394,7 +408,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         int i = (int)zoom;
         if (i > self.satellites.count) {
-            i = self.satellites.count;
+            i = (int)self.satellites.count;
         }
         SatelliteNode* satellite = self.satellites[i-1];
         CGFloat lesserDimension = MIN(self.view.bounds.size.width, self.view.bounds.size.height);
@@ -463,5 +477,13 @@
             self.trails = newTrails;
         }
     });
+}
+
+#pragma mark TimeSliderDelegate
+
+- (void)timeSliderValueDidChange:(CGFloat)timeSliderValue {
+    if (timeSliderValue >= 0.0f) {
+        self.targetTimeCompression = timeSliderValue;
+    }
 }
 @end
