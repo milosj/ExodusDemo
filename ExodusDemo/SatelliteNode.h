@@ -30,7 +30,7 @@
 @property (strong, nonatomic) NSMutableArray<NSValue*>* positions;
 @property (strong, nonatomic) NSMutableArray<NSValue*>* inertialVectors;
 
-- (void)update:(CFTimeInterval)time;
+- (void)updateModelForTime:(CFTimeInterval)time;
 - (void)precalculateOrbits;
 
 @end

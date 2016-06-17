@@ -135,7 +135,7 @@
 - (void)setIsCastingShadow:(BOOL)isCastingShadow {
     self.shadow.hidden = !isCastingShadow;
 }
-- (void)update:(CFTimeInterval)time {
+- (void)updateModelForTime:(CFTimeInterval)time {
     for (SatelliteNode* satellite in self.satellites) {
         [self update:time forBody:self andSatellite:satellite];
     }

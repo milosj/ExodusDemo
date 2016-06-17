@@ -18,6 +18,13 @@
 
 @implementation TimeControlViewController
 
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    [self.timeSlider setMaximumValueImage:[UIImage new]];
+    [self.timeSlider setMinimumValueImage:[UIImage new]];
+    [self.timeSlider setThumbImage:[UIImage imageNamed:@"ic_play_circle"] forState:UIControlStateNormal];
+}
+
 - (IBAction)sliderDidChange:(UISlider *)sender {
     [self didSlide];
 }
@@ -37,7 +44,7 @@
 - (void)didSlide {
     if (self.slideEnabled) {
         for (NSObject<TimeSliderDelegate>* delegate in self.delegates) {
-            [delegate timeSliderValueDidChange:MAX(self.timeSlider.value-0.5f*self.timeSlider.value, 1)];
+            [delegate timeSliderValueDidChange:MAX(self.timeSlider.value, 1.0f)];
         }
     }
 }

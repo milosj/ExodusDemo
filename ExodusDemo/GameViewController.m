@@ -88,12 +88,13 @@
 }
 
 - (IBAction)sliderDidSlide:(UISlider *)sender {
-    self.scene.zoom = MAX(round(sender.maximumValue - sender.value), 0.25f);
+    self.scene.zoom = sender.value;
+    NSLog(@"z %f", sender.value);
 }
-- (IBAction)switchDidSwitch:(UISwitch *)sender {
+- (IBAction)didSwitchSymbols:(UISwitch *)sender {
     [self.scene setShowSymbols:sender.isOn];
 }
-- (IBAction)trailsSwitchDidSwitch:(UISwitch *)sender {
+- (IBAction)didSwitchTrails:(UISwitch *)sender {
     self.scene.showTrails = sender.isOn;
 }
 

@@ -78,6 +78,7 @@
     self.label.position = CGPointMake(CGRectGetMidX(self.overlay.frame), CGRectGetMaxY(self.overlay.frame));
     self.label.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeLeft;
     [self.overlay addChild:self.label];
+    self.label.hidden = YES;
 
     self.satellites = [NSMutableArray new];
     self.trails = [NSMutableDictionary new];
@@ -284,6 +285,7 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         [self.sun precalculateOrbits];
         self.isRunning = YES;
+        [self updateModelForTime:0];
     });
     
 }
@@ -295,6 +297,8 @@
         UITouch* touch = touches.anyObject;
         CGPoint point = [touch locationInNode:self];
         NSArray<SKNode*>* touchedNodes = [self nodesAtPoint:point];
+        NSLog(@"Touched %f, %f", point.x, point.y);
+        NSLog(@"Touched nodes %@", touchedNodes);
         BOOL found = NO;
         SKNode* targetNode = nil;
         int targetZoomLevel = 0;
@@ -308,15 +312,16 @@
                 if ([self.satellites containsObject:(SatelliteNode*)node]) {
                     self.zoom = (int)[self.satellites indexOfObject:(SatelliteNode*)node]+1;
                 }
-                
+                NSLog(@"Selected %@", node);
                 break;
             }
         }
         if (!found) {
             self.selectedNode = nil;
             targetNode = self.sun;
-            targetZoomLevel = (int) self.satellites.count;
+            targetZoomLevel = self.zoom;
             self.zoom = self.satellites.count;
+            NSLog(@"Deselecting");
         }
         self.isPositioningCamera = YES;
         SKAction* positionCamera = [SKAction moveTo:targetNode.position duration:0.6f];
@@ -340,64 +345,74 @@
         }
         /* Called before each frame is rendered */
         if (currentTime > self.nextUpdateTime && self.actualTimeCompression > 0) {
-            self.nextUpdateTime = currentTime ;//+ self.actualTimeCompression*1.0f/60.0f;
-            self.label.text = [NSString stringWithFormat:@"%.2f", currentTime];
+            self.nextUpdateTime = currentTime;
+
+            [self updateModelForTime:self.time];
             
-//            for (SatelliteNode* satellite in self.satellites) {
-//    //            SKNode* previousTrail = [self.trails[satellite.name] firstObject];
-//    //            if (self.showTrails && (!previousTrail || ( self.trailTime < satellite.orbitLength && sqrt(pow(previousTrail.position.x-satellite.position.x,2)+pow(previousTrail.position.y-satellite.position.y,2))>2*satellite.spriteRadius))) {
-//    //                SKNode* trail = satellite.trailNode;
-//    //                [self addChild:trail];
-//    //                [self.trails[satellite.name] insertObject:trail atIndex:0];
-//    ////                if (self.trails[satellite.name].count > satellite.orbitLength) {
-//    ////                    [[self.trails[satellite.name] lastObject] removeFromParent];
-//    ////                    [self.trails[satellite.name] removeLastObject];
-//    ////                }
-//    //            }
-//            }
-            [self.sun update:self.time];
-            
-            
-            
-            for (SatelliteNode* satellite in self.satellites) {
-                if (self.scale < 30) {
-                    satellite.overlayShape.hidden = YES;
-                } else {
-                    satellite.overlayShape.hidden = NO;
-                    CGPoint convertedPosition = [self convertPoint:satellite.position toNode:self.camera];
-                    satellite.overlayShape.position = CGPointMake(convertedPosition.x, convertedPosition.y-12.0f);
+            if (fabs(self.targetTimeCompression-self.actualTimeCompression) < 1) {
+                self.actualTimeCompression = self.targetTimeCompression;
+            } else {
+                if (self.actualTimeCompression < self.targetTimeCompression) {
+                    self.actualTimeCompression += MAX(timeCompressionMinimalChangeFactor*self.actualTimeCompression, 0.1f);
+                } else if (self.actualTimeCompression > self.targetTimeCompression) {
+                    self.actualTimeCompression -= MAX(timeCompressionMinimalChangeFactor*self.actualTimeCompression, 0.1f);
                 }
             }
-            if (self.scale < 30) {
-                self.sun.overlayShape.hidden = YES;
-            } else {
-                self.sun.overlayShape.hidden = NO;
-                CGPoint convertedPosition = [self convertPoint:self.sun.position toNode:self.camera];
-                self.sun.overlayShape.position = CGPointMake(convertedPosition.x, convertedPosition.y-12.0f);
-            }
-            
-            if (self.selectedNode) {
-                self.camera.position = self.selectedNode.position;
-            }
-            
-            self.time += self.actualTimeCompression;
-            if (self.showTrails) {
-                self.trailTime += self.actualTimeCompression;
-            }
-        }
-        if (fabs(self.targetTimeCompression-self.actualTimeCompression) < 1) {
-            self.actualTimeCompression = self.targetTimeCompression;
-        } else {
-            if (self.actualTimeCompression < self.targetTimeCompression) {
-                self.actualTimeCompression += MAX(timeCompressionMinimalChangeFactor*self.actualTimeCompression, 0.1f);
-            } else if (self.actualTimeCompression > self.targetTimeCompression) {
-                self.actualTimeCompression -= MAX(timeCompressionMinimalChangeFactor*self.actualTimeCompression, 0.1f);
-            }
+            self.label.text = [NSString stringWithFormat:@"%.6f", self.actualTimeCompression];
+
         }
     }
 }
 
+-(void)updateModelForTime:(CFTimeInterval)currentTime {
+    //            self.label.text = [NSString stringWithFormat:@"%.2f", currentTime];
+    
+    //            for (SatelliteNode* satellite in self.satellites) {
+    //    //            SKNode* previousTrail = [self.trails[satellite.name] firstObject];
+    //    //            if (self.showTrails && (!previousTrail || ( self.trailTime < satellite.orbitLength && sqrt(pow(previousTrail.position.x-satellite.position.x,2)+pow(previousTrail.position.y-satellite.position.y,2))>2*satellite.spriteRadius))) {
+    //    //                SKNode* trail = satellite.trailNode;
+    //    //                [self addChild:trail];
+    //    //                [self.trails[satellite.name] insertObject:trail atIndex:0];
+    //    ////                if (self.trails[satellite.name].count > satellite.orbitLength) {
+    //    ////                    [[self.trails[satellite.name] lastObject] removeFromParent];
+    //    ////                    [self.trails[satellite.name] removeLastObject];
+    //    ////                }
+    //    //            }
+    //            }
+    [self.sun updateModelForTime:self.time];
+    
+    [self updateOverlay];
+    
+    if (self.selectedNode) {
+        self.camera.position = self.selectedNode.position;
+    }
+    
+    self.time += self.actualTimeCompression;
+    if (self.showTrails) {
+        self.trailTime += self.actualTimeCompression;
+    }
 
+}
+
+- (void)updateOverlay {
+    for (SatelliteNode* satellite in self.satellites) {
+        if (self.scale < 60) {
+            satellite.overlayShape.hidden = YES;
+        } else {
+            satellite.overlayShape.hidden = NO;
+            CGPoint convertedPosition = [self convertPoint:satellite.position toNode:self.camera];
+            satellite.overlayShape.position = CGPointMake(convertedPosition.x, convertedPosition.y-12.0f);
+        }
+    }
+    if (self.scale < 30) {
+        self.sun.overlayShape.hidden = YES;
+    } else {
+        self.sun.overlayShape.hidden = NO;
+        CGPoint convertedPosition = [self convertPoint:self.sun.position toNode:self.camera];
+        self.sun.overlayShape.position = CGPointMake(convertedPosition.x, convertedPosition.y-12.0f);
+    }
+    
+}
 
 - (CGFloat)zoom {
     return self.scale;
@@ -406,26 +421,33 @@
 - (void)setZoom:(CGFloat)zoom {
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        int i = (int)zoom;
-        if (i > self.satellites.count) {
-            i = (int)self.satellites.count;
-        }
-        SatelliteNode* satellite = self.satellites[i-1];
-        CGFloat lesserDimension = MIN(self.view.bounds.size.width, self.view.bounds.size.height);
-        CGFloat zoomRatio = 2*satellite.orbitRadius/lesserDimension+1;
-        if (self.scale != zoomRatio) {
-            CGFloat oldScale = self.scale;
-            self.scale = zoomRatio;
-            SKAction* zoomInAction =  [SKAction scaleTo:zoomRatio duration:MIN(0.5f,fabs(oldScale - zoomRatio)/10)];
-//            NSLog(@"z %f-%f %f in %@", oldScale, zoomRatio, fabs(oldScale - zoomRatio)/10, zoomInAction);
-            if (self.zoomQueue.count == 0) {
-                [self.zoomQueue addObject:zoomInAction];
-                [self performNextActionInQueue:self.zoomQueue withCamera:self.camera];
-//                NSLog(@"p-- %@", zoomInAction);
-            } else {
-                [self.zoomQueue addObject:zoomInAction];
-            }
-        }
+//        int i = (int)zoom;
+//        if (i > self.satellites.count) {
+//            i = (int)self.satellites.count;
+//        }
+//        if (i < 1) {
+//            i = 1;
+//        }
+//        SatelliteNode* satellite = self.satellites[i-1];
+//        CGFloat lesserDimension = MIN(self.view.bounds.size.width, self.view.bounds.size.height);
+//        CGFloat zoomRatio = 2*satellite.orbitRadius/lesserDimension+1;
+//        if (self.scale != zoomRatio) {
+//            CGFloat oldScale = self.scale;
+//            self.scale = zoomRatio;
+//            SKAction* zoomInAction =  [SKAction scaleTo:zoomRatio duration:MIN(0.5f,fabs(oldScale - zoomRatio)/10)];
+////            NSLog(@"z %f-%f %f in %@", oldScale, zoomRatio, fabs(oldScale - zoomRatio)/10, zoomInAction);
+//            if (self.zoomQueue.count == 0) {
+//                [self.zoomQueue addObject:zoomInAction];
+//                [self performNextActionInQueue:self.zoomQueue withCamera:self.camera];
+////                NSLog(@"p-- %@", zoomInAction);
+//            } else {
+//                [self.zoomQueue addObject:zoomInAction];
+//            }
+//        }
+        SKAction* zoomInAction = [SKAction scaleTo:zoom duration:0.1f];
+        [self.zoomQueue addObject:zoomInAction];
+        [self performNextActionInQueue:self.zoomQueue withCamera:self.camera];
+        [self updateOverlay];
     });
 }
 
